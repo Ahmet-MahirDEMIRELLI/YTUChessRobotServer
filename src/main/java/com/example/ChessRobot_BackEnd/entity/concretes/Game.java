@@ -24,6 +24,9 @@ public class Game {
     @Column(name = "rated")
     private boolean rated;
 
+    @Column(name = "time")
+    private String time;
+
     @OneToOne(mappedBy = "games")
     @JoinColumn(name = "white_player_id")
     private User whitePlayer;
@@ -41,10 +44,10 @@ public class Game {
     private Date endedAt;
 
     @Column(name = "white_moves")
-    private String whiteMoves;
+    private String whiteMoves = "";
 
     @Column(name = "black_moves")
-    private String blackMoves;
+    private String blackMoves = "";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "game_status")
