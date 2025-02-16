@@ -21,6 +21,10 @@ public class Game {
     @Column(name = "id")
     private int id;
 
+    @OneToOne(mappedBy = "games")
+    @JoinColumn(name = "match_id")
+    private Match match;
+
     @Column(name = "rated")
     private boolean rated;
 
