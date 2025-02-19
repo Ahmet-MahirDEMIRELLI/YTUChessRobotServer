@@ -1,7 +1,6 @@
 package com.example.ChessRobot_BackEnd.business.concretes;
 
 import com.example.ChessRobot_BackEnd.business.abstracts.MoveService;
-import com.example.ChessRobot_BackEnd.business.constants.MoveMessages;
 import com.example.ChessRobot_BackEnd.core.utilities.results.DataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.ErrorDataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.SuccessDataResult;
@@ -22,62 +21,64 @@ public class MoveManager implements MoveService {
         ArrayList<Move> possibleMoves = new ArrayList<>();
         byte[][] board = mapBoardMatrix(match.getBoardMatrix());
         if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == 0){
-            return new ErrorDataResult<>(MoveMessages.noPieceToMove);
+            return new ErrorDataResult<>();
+        }
+
+        DataResult<Move> result = getMove(board, pieceStartSquare, pieceEndSquare);
+        if(!result.isSuccess()){
+            return new ErrorDataResult<>();
         }
 
         boolean isWhitePlaying = board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] <= 7;
+        if(isWhitePlaying){
+            if(match.isCheck()){
+                if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.WHITE_KING.getValue()){  // playing with the king
 
-        if(match.isCheck()){
-            if(isWhitePlaying){
-                if(match.getBlackCheckers().startsWith("-1", 9)){  // double check
-                    if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.WHITE_KING.getValue()){
-                        possibleMoves = getNormalMoves();
-                    }
-                    else{
-                        return new ErrorDataResult<>(MoveMessages.doubleCheck);
-                    }
                 }
                 else{
-                    possibleMoves = getBlockingMoves();
-                    Move eatingMove = getEatingMove();
-                    if(eatingMove != null){
-                        possibleMoves.add(eatingMove);
+                    if(match.getBlackCheckers().startsWith("-1", 9)){  // not double-check
+                        if(doesItBlockCheck() || doesItTakeChecker()){
+                            return new SuccessDataResult<>(result.getData());
+                        }
+                        return new ErrorDataResult<>();
+                    }
+                    else{
+                        return new ErrorDataResult<>();
                     }
                 }
             }
             else{
-                if(match.getWhiteCheckers().startsWith("-1", 9)){  // double check
-                    if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.BLACK_KING.getValue()){
-                        possibleMoves = getNormalMoves();
-                    }
-                    else{
-                        return new ErrorDataResult<>(MoveMessages.doubleCheck);
-                    }
+                if(isPinned()){
+                    return new ErrorDataResult<>();
                 }
                 else{
-                    possibleMoves = getBlockingMoves();
-                    Move eatingMove = getEatingMove();
-                    if(eatingMove != null){
-                        possibleMoves.add(eatingMove);
-                    }
+                    return new SuccessDataResult<>(result.getData());
                 }
             }
         }
         else{
-            possibleMoves = getNormalMoves();
-        }
+            if(match.isCheck()){
+                if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.BLACK_KING.getValue()){  // playing with the king
 
-        if(possibleMoves == null){
-            return new ErrorDataResult<>(MoveMessages.noPossibleMove);
-        }
+                }
+                else{
+                    if(match.getWhiteCheckers().startsWith("-1", 9)){  // not double-check
+                        if(doesItBlockCheck() || doesItTakeChecker()){
+                            return new SuccessDataResult<>(result.getData());
+                        }
+                        return new ErrorDataResult<>();
+                    }
+                    else{
+                        return new ErrorDataResult<>();
+                    }
+                }
+            }
+            else{
 
-        for (Move move : possibleMoves) {
-            if (move.getRow() == pieceStartSquare.getRow() && move.getCol() == pieceEndSquare.getCol()) {
-                return new SuccessDataResult<>(move, MoveMessages.moveIsPlayable);
             }
         }
 
-        return new ErrorDataResult<>(MoveMessages.moveIsNotPossible);
+        return new ErrorDataResult<>();
     }
 
     @Override
@@ -85,16 +86,117 @@ public class MoveManager implements MoveService {
         return null;
     }
 
-    private ArrayList<Move> getNormalMoves(){
-        return null;
+    private DataResult<Move> getMove(byte[][] board, Square start, Square end){
+        boolean isValid = false;
+        Move move = new Move();
+        move.setRow(end.getRow());
+        move.setCol(end.getCol());
+        move.setMessage("");
+        switch (board[start.getRow()][start.getCol()]){
+            case 1:
+                if(start.getCol() == end.getCol() && start.getRow() - 1 == end.getRow()){  // 1 square push
+                    if(end.getRow() == 0){  // upgrade
+                        move.setMessage("Upgrade");
+                    }
+                    isValid = true;
+                }
+                else if(start.getCol() == end.getCol() && start.getRow() - 2 == end.getRow() &&
+                        start.getRow() == 6 && board[start.getRow()-1][start.getCol()] == 0 &&
+                        board[end.getRow()][end.getCol()] == 0){  // two square push
+                    move.setMessage("Two square push");
+                    isValid = true;
+                }
+                else if(start.getRow() - 1 == end.getRow() && board[end.getRow()][end.getCol()] >= ChessPiece.BLACK_PAWN.getValue() &&
+                        (start.getCol() - 1 == end.getCol() || start.getCol() + 1 == end.getCol())){    // eating piece to left or right
+                    isValid = true;
+                }
+                else if(start.getRow() - 1 == end.getRow() && board[end.getRow()+1][end.getCol()] == ChessPiece.BLACK_TWO_PAWN.getValue() &&
+                        (start.getCol() - 1 == end.getCol()  || start.getCol() + 1 == end.getCol())){    //  en passant to left or right
+                    move.setMessage("En passant " + end.getRow() + 1 + "," + end.getCol());
+                    isValid = true;
+                }
+                break;
+            case 2:
+                if(start.getCol() == end.getCol() && start.getRow() - 1 == end.getRow()){  // 1 square push
+                    isValid = true;
+                }
+                else if(start.getRow() - 1 == end.getRow() && board[end.getRow()][end.getCol()] >= ChessPiece.BLACK_PAWN.getValue() &&
+                        (start.getCol() - 1 == end.getCol() || start.getCol() + 1 == end.getCol())){    // eating piece to left or right
+                    isValid = true;
+                }
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                if(start.getCol() == end.getCol() && start.getRow() + 1 == end.getRow()){  // 1 square push
+                    if(end.getRow() == 7){  // upgrade
+                        move.setMessage("Upgrade");
+                    }
+                    isValid = true;
+                }
+                else if(start.getCol() == end.getCol() && start.getRow() + 2 == end.getRow() &&
+                        start.getRow() == 1 && board[start.getRow()+1][start.getCol()] == 0 &&
+                        board[end.getRow()][end.getCol()] == 0){  // two square push
+                    move.setMessage("Two square push");
+                    isValid = true;
+                }
+                else if(start.getRow() + 1 == end.getRow() && board[end.getRow()][end.getCol()] < ChessPiece.WHITE_KING.getValue() && board[end.getRow()][end.getCol()] != 0 &&
+                        (start.getCol() - 1 == end.getCol() || start.getCol() + 1 == end.getCol())){     // eating piece to left or right
+                    isValid = true;
+                }
+                else if(start.getRow() + 1 == end.getRow() && board[end.getRow()+1][end.getCol()] == ChessPiece.WHITE_TWO_PAWN.getValue() &&
+                        (start.getCol() - 1 == end.getCol() || start.getCol() + 1 == end.getCol())){   //  en passant to left or right
+                    move.setMessage("En passant " + end.getRow() + 1 + "," + end.getCol());
+                    isValid = true;
+                }
+                break;
+            case 9:
+                if(start.getCol() == end.getCol() && start.getRow() + 1 == end.getRow()){  // 1 square push
+                    isValid = true;
+                }
+                else if(start.getRow() + 1 == end.getRow() && board[end.getRow()][end.getCol()] < ChessPiece.WHITE_KING.getValue() && board[end.getRow()][end.getCol()] != 0 &&
+                        (start.getCol() - 1 == end.getCol() || start.getCol() + 1 == end.getCol())){     // eating piece to left or right
+                    isValid = true;
+                }
+                break;
+            case 10:
+                break;
+            case 11:
+                break;
+            case 12:
+                break;
+            case 13:
+                break;
+            case 14:
+                break;
+        }
+
+        if(isValid){
+            return new SuccessDataResult<>(move);
+        }
+        else{
+            return new ErrorDataResult<>();
+        }
     }
 
-    private ArrayList<Move> getBlockingMoves(){
-        return null;
+    private boolean doesItBlockCheck(){
+        return false;
     }
 
-    private Move getEatingMove(){
-        return null;
+    private boolean doesItTakeChecker(){
+        return false;
+    }
+
+    private boolean isPinned(){
+        return false;
     }
 
     private static byte[][] mapBoardMatrix(String boardMatrix) {
