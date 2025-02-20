@@ -6,7 +6,6 @@ import com.example.ChessRobot_BackEnd.core.utilities.results.ErrorDataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.SuccessDataResult;
 import com.example.ChessRobot_BackEnd.entity.concretes.*;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.*;
 
 public class MoveManager implements MoveService {
@@ -92,6 +91,9 @@ public class MoveManager implements MoveService {
         move.setRow(end.getRow());
         move.setCol(end.getCol());
         move.setMessage("");
+        int rowDiff;
+        int colDiff;
+        int opponentKingValue = board[start.getRow()][start.getCol()] <= ChessPiece.WHITE_KING.getValue() ? ChessPiece.BLACK_KING.getValue() : ChessPiece.WHITE_KING.getValue();
         switch (board[start.getRow()][start.getCol()]){
             case 1:
                 if(start.getCol() == end.getCol() && start.getRow() - 1 == end.getRow()){  // 1 square push
@@ -128,6 +130,71 @@ public class MoveManager implements MoveService {
             case 3:
                 break;
             case 4:
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                    // in a diagonal and
+                        (board[end.getRow()][end.getCol()] == 0 ||                                   // empty or
+                                (board[end.getRow()][end.getCol()] >= 8 &&                           // has black piece
+                                        board[end.getRow()][end.getCol()] != opponentKingValue))){   // other than king
+                    int row = start.getRow();
+                    int col = start.getCol();
+                    if(rowDiff > 0 && colDiff > 0){  // end is on the upper left diagonal of start
+                        row--;
+                        col--;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row--;
+                            col--;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                    else if(rowDiff > 0 && colDiff < 0) {  // end is on the upper right diagonal of start
+                        row--;
+                        col++;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row--;
+                            col++;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                    else if(rowDiff < 0 && colDiff > 0) {  // end is on the lower left diagonal of start
+                        row++;
+                        col--;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row++;
+                            col--;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                    else if(rowDiff < 0 && colDiff < 0) {  // end is on the lower right diagonal of start
+                        row++;
+                        col++;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row++;
+                            col++;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                }
                 break;
             case 5:
                 break;
@@ -170,6 +237,70 @@ public class MoveManager implements MoveService {
             case 10:
                 break;
             case 11:
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                                   // in a diagonal and
+                        (board[end.getRow()][end.getCol()] <= 7 &&                                                  // empty or has white piece
+                                board[end.getRow()][end.getCol()] != ChessPiece.WHITE_KING.getValue())){   // other than king
+                    int row = start.getRow();
+                    int col = start.getCol();
+                    if(rowDiff > 0 && colDiff > 0){  // end is on the upper left diagonal of start
+                        row--;
+                        col--;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row--;
+                            col--;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                    else if(rowDiff > 0 && colDiff < 0) {  // end is on the upper right diagonal of start
+                        row--;
+                        col++;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row--;
+                            col++;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                    else if(rowDiff < 0 && colDiff > 0) {  // end is on the lower left diagonal of start
+                        row++;
+                        col--;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row++;
+                            col--;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                    else if(rowDiff < 0 && colDiff < 0) {  // end is on the lower right diagonal of start
+                        row++;
+                        col++;
+                        while(row != end.getRow()){
+                            if(board[row][col] != 0){  // piece between end and start
+                                break;
+                            }
+                            row++;
+                            col++;
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                }
                 break;
             case 12:
                 break;
