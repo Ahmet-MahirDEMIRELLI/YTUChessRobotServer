@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 @Entity
 @AllArgsConstructor
@@ -34,10 +37,12 @@ public class Match {
     private int blackRemainingSeconds;
 
     @Column(name = "last_white_move_date_time")
-    private int lastWhiteMoveDateTime;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Date lastWhiteMoveDateTime;
 
     @Column(name = "last_black_move_date_time")
-    private int lastBlackMoveDateTime;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Date lastBlackMoveDateTime;
 
     @Column(name = "board_matrix", length = 191)
     private String boardMatrix = "12-10-11-13-14-11-10-12-" +
