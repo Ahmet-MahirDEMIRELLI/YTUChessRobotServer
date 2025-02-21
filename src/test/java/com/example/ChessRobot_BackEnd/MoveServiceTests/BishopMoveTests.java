@@ -21,7 +21,7 @@ class BishopMoveTests {
 			.id(1)
 			.boardMatrix("12-10-11-13-14-11-10-12-" +
 						 " 8- 8- 8- 8- 0- 8- 8- 0-" +
-						 " 0- 0- 0- 0- 0- 0- 0- 0-" +
+						 " 0- 0- 0- 0- 0- 0- 0- 12-" +
 						 " 0- 0- 0- 0- 0- 0- 8- 0-" +
 						 " 0- 2- 0- 0- 0- 0- 0- 0-" +
 						 " 1- 0- 0- 0- 0- 0- 0- 0-" +
@@ -41,7 +41,9 @@ class BishopMoveTests {
 				new Object[]{new Square((short) 0, (short) 5), new Square((short) 3, (short) 2), true},   // Ff8 -> Fc5
 				new Object[]{new Square((short) 0, (short) 5), new Square((short) 4, (short) 1), true},   // Ff8 -> Fxb4
 				new Object[]{new Square((short) 0, (short) 5), new Square((short) 1, (short) 6), false},  // eating same color
-				new Object[]{new Square((short) 7, (short) 2), new Square((short) 5, (short) 0), false}   // eating same color
+				new Object[]{new Square((short) 7, (short) 2), new Square((short) 5, (short) 0), false},  // eating same color
+				new Object[]{new Square((short) 7, (short) 2), new Square((short) 2, (short) 7), false},  // trying to step over a piece
+				new Object[]{new Square((short) 0, (short) 5), new Square((short) 5, (short) 0), false}   // trying to step over a piece
 		);
 	}
 
