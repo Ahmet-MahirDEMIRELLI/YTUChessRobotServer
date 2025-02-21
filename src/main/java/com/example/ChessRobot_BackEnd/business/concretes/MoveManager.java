@@ -5,6 +5,8 @@ import com.example.ChessRobot_BackEnd.core.utilities.results.DataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.ErrorDataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.SuccessDataResult;
 import com.example.ChessRobot_BackEnd.entity.concretes.*;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
@@ -16,14 +18,14 @@ public class MoveManager implements MoveService {
     }
 
     @Override
-    public DataResult<Move> isMovePossible(Match match, Square pieceStartSquare, Square pieceEndSquare) {
-        ArrayList<Move> possibleMoves = new ArrayList<>();
+    public DataResult<MoveDto> isMovePossible(Match match, SquareDto pieceStartSquare, SquareDto pieceEndSquare) {
+        ArrayList<MoveDto> possibleMoves = new ArrayList<>();
         byte[][] board = mapBoardMatrix(match.getBoardMatrix());
         if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == 0){
             return new ErrorDataResult<>();
         }
 
-        DataResult<Move> result = getMove(board, pieceStartSquare, pieceEndSquare);
+        DataResult<MoveDto> result = getMove(board, pieceStartSquare, pieceEndSquare);
         if(!result.isSuccess()){
             return new ErrorDataResult<>();
         }
@@ -81,13 +83,13 @@ public class MoveManager implements MoveService {
     }
 
     @Override
-    public DataResult<Game> play(Game game, Move move) {
+    public DataResult<Game> play(Game game, MoveDto move) {
         return null;
     }
 
-    private DataResult<Move> getMove(byte[][] board, Square start, Square end){
+    private DataResult<MoveDto> getMove(byte[][] board, SquareDto start, SquareDto end){
         boolean isValid = false;
-        Move move = new Move();
+        MoveDto move = new MoveDto();
         move.setRow(end.getRow());
         move.setCol(end.getCol());
         move.setMessage("");

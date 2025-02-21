@@ -1,6 +1,5 @@
 package com.example.ChessRobot_BackEnd.entity.dtos.Game;
 
-import com.example.ChessRobot_BackEnd.entity.concretes.Square;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,7 @@ public class PlayDto {
 
     private String gameId;
 
-    private Square pieceStartSquare;
+    private SquareDto pieceStartSquare;
 
-    private Square pieceEndSquare;
+    private SquareDto pieceEndSquare;
 }

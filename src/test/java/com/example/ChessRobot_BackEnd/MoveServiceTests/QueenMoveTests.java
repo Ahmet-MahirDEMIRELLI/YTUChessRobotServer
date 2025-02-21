@@ -3,8 +3,8 @@ package com.example.ChessRobot_BackEnd.MoveServiceTests;
 import com.example.ChessRobot_BackEnd.business.abstracts.MoveService;
 import com.example.ChessRobot_BackEnd.core.utilities.results.DataResult;
 import com.example.ChessRobot_BackEnd.entity.concretes.Match;
-import com.example.ChessRobot_BackEnd.entity.concretes.Move;
-import com.example.ChessRobot_BackEnd.entity.concretes.Square;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,44 +51,44 @@ class QueenMoveTests {
 			.build();
 	static Stream<Object[]> bishopFeatureMoveTestCasesForPlayEmptySquareOrEatPieceLikeBishopPosition() {
 		return Stream.of(
-				new Object[]{new Square((short) 7, (short) 2), new Square((short) 6, (short) 3), true},   // Vc1 -> Vd2
-				new Object[]{new Square((short) 7, (short) 2), new Square((short) 4, (short) 5), true},   // Vc1 -> Vf4
-				new Object[]{new Square((short) 7, (short) 2), new Square((short) 3, (short) 6), true},   // Vc1 -> Vxg5
-				new Object[]{new Square((short) 0, (short) 5), new Square((short) 1, (short) 4), true},   // Vf8 -> Ve7
-				new Object[]{new Square((short) 0, (short) 5), new Square((short) 3, (short) 2), true},   // Vf8 -> Vc5
-				new Object[]{new Square((short) 0, (short) 5), new Square((short) 4, (short) 1), true},   // Vf8 -> Vxb4
-				new Object[]{new Square((short) 0, (short) 5), new Square((short) 1, (short) 6), false},  // eating same color
-				new Object[]{new Square((short) 7, (short) 2), new Square((short) 5, (short) 0), false},  // eating same color
-				new Object[]{new Square((short) 7, (short) 2), new Square((short) 2, (short) 7), false},  // trying to step over a piece
-				new Object[]{new Square((short) 0, (short) 5), new Square((short) 5, (short) 0), false}   // trying to step over a piece
+				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 6, (byte) 3), true},   // Vc1 -> Vd2
+				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 4, (byte) 5), true},   // Vc1 -> Vf4
+				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 3, (byte) 6), true},   // Vc1 -> Vxg5
+				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 1, (byte) 4), true},   // Vf8 -> Ve7
+				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 3, (byte) 2), true},   // Vf8 -> Vc5
+				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 4, (byte) 1), true},   // Vf8 -> Vxb4
+				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 1, (byte) 6), false},  // eating same color
+				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 5, (byte) 0), false},  // eating same color
+				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 2, (byte) 7), false},  // trying to step over a piece
+				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 5, (byte) 0), false}   // trying to step over a piece
 		);
 	}
 	static Stream<Object[]> rookFeatureMoveTestCasesForPlayEmptySquareOrEatPieceLikeRookPosition() {
 		return Stream.of(
-				new Object[]{new Square((short) 4, (short) 2), new Square((short) 4, (short) 0), true},   // Kc4 -> Ka4
-				new Object[]{new Square((short) 4, (short) 2), new Square((short) 4, (short) 5), true},   // Kc4 -> Kxf4
-				new Object[]{new Square((short) 4, (short) 2), new Square((short) 7, (short) 2), false},  // eating same color
-				new Object[]{new Square((short) 4, (short) 2), new Square((short) 1, (short) 2), false},  // trying to jump over a piece
-				new Object[]{new Square((short) 4, (short) 2), new Square((short) 4, (short) 6), false},  // trying to jump over a piece
-				new Object[]{new Square((short) 3, (short) 5), new Square((short) 3, (short) 7), true},   // Kf5 -> Kc5
-				new Object[]{new Square((short) 3, (short) 5), new Square((short) 3, (short) 2), true},   // Kf5 -> Kxf4
-				new Object[]{new Square((short) 3, (short) 5), new Square((short) 0, (short) 5), false},  // eating same color
-				new Object[]{new Square((short) 3, (short) 5), new Square((short) 6, (short) 5), false},  // trying to jump over a piece
-				new Object[]{new Square((short) 3, (short) 5), new Square((short) 3, (short) 1), false}   // trying to jump over a piece
+				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 4, (byte) 0), true},   // Kc4 -> Ka4
+				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 4, (byte) 5), true},   // Kc4 -> Kxf4
+				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 7, (byte) 2), false},  // eating same color
+				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 1, (byte) 2), false},  // trying to jump over a piece
+				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 4, (byte) 6), false},  // trying to jump over a piece
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 7), true},   // Kf5 -> Kc5
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 2), true},   // Kf5 -> Kxf4
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 0, (byte) 5), false},  // eating same color
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 6, (byte) 5), false},  // trying to jump over a piece
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 1), false}   // trying to jump over a piece
 		);
 	}
 
 	@ParameterizedTest
 	@MethodSource("bishopFeatureMoveTestCasesForPlayEmptySquareOrEatPieceLikeBishopPosition")
-	void testPlayEmptySquareOrEatPieceLikeBishopPosition(Square from, Square to, boolean expected) {
-		DataResult<Move> dataResult = moveService.isMovePossible(playEmptySquareOrEatPieceLikeBishopPosition, from, to);
+	void testPlayEmptySquareOrEatPieceLikeBishopPosition(SquareDto from, SquareDto to, boolean expected) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(playEmptySquareOrEatPieceLikeBishopPosition, from, to);
 		assertEquals(expected, dataResult.isSuccess(), "Queens move from " + from + " to " + to + " failed!");
 	}
 
 	@ParameterizedTest
 	@MethodSource("rookFeatureMoveTestCasesForPlayEmptySquareOrEatPieceLikeRookPosition")
-	void testPlayEmptySquareOrEatPieceLikeRookPosition(Square from, Square to, boolean expected) {
-		DataResult<Move> dataResult = moveService.isMovePossible(playEmptySquareOrEatPieceLikeRookPosition, from, to);
+	void testPlayEmptySquareOrEatPieceLikeRookPosition(SquareDto from, SquareDto to, boolean expected) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(playEmptySquareOrEatPieceLikeRookPosition, from, to);
 		assertEquals(expected, dataResult.isSuccess(), "Queens move from " + from + " to " + to + " failed!");
 	}
 }
