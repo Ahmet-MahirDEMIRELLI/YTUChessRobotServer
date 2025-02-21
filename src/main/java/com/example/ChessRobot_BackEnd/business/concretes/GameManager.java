@@ -4,12 +4,11 @@ import com.example.ChessRobot_BackEnd.business.abstracts.GameService;
 import com.example.ChessRobot_BackEnd.business.abstracts.MoveService;
 import com.example.ChessRobot_BackEnd.business.abstracts.UserService;
 import com.example.ChessRobot_BackEnd.business.constants.GameMessages;
-import com.example.ChessRobot_BackEnd.business.constants.UserMessages;
 import com.example.ChessRobot_BackEnd.core.utilities.results.*;
 import com.example.ChessRobot_BackEnd.dataAccess.abstracts.GameDao;
 import com.example.ChessRobot_BackEnd.entity.concretes.Game;
 import com.example.ChessRobot_BackEnd.entity.concretes.Match;
-import com.example.ChessRobot_BackEnd.entity.concretes.Move;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.InitializeGameDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.PlayDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,12 +89,12 @@ public class GameManager implements GameService {
         Game game = null;
         //Game game = gameService.getGameById(playDto.getGameId());
         Match match = game.getMatch();
-        DataResult<Move> moveDataResult = this.moveService.isMovePossible(match, playDto.getPieceStartSquare(), playDto.getPieceEndSquare());
+        DataResult<MoveDto> moveDataResult = this.moveService.isMovePossible(match, playDto.getPieceStartSquare(), playDto.getPieceEndSquare());
         if(!moveDataResult.isSuccess()){
             return new ErrorDataResult<>(GameMessages.moveIsNotPossible);
         }
 
-        Move move = moveDataResult.getData();
+        MoveDto move = moveDataResult.getData();
         DataResult<Game> gameDataResult = this.moveService.play(game, move);
         if(!gameDataResult.isSuccess()){
             return new ErrorDataResult<>(GameMessages.unexpectedErrorOccurred);

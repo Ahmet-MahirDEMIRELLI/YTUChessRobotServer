@@ -3,8 +3,8 @@ package com.example.ChessRobot_BackEnd.MoveServiceTests;
 import com.example.ChessRobot_BackEnd.business.abstracts.MoveService;
 import com.example.ChessRobot_BackEnd.core.utilities.results.DataResult;
 import com.example.ChessRobot_BackEnd.entity.concretes.Match;
-import com.example.ChessRobot_BackEnd.entity.concretes.Move;
-import com.example.ChessRobot_BackEnd.entity.concretes.Square;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,89 +87,89 @@ class PawnMoveTests {
 			.build();
 	static Stream<Object[]> pawnMoveTestCasesForStartingPosition() {
 		return Stream.of(
-				new Object[]{new Square((short) 6, (short) 4), new Square((short) 4, (short) 4), true},   // e2 -> e4
-				new Object[]{new Square((short) 1, (short) 4), new Square((short) 3, (short) 4), true},   // e7 -> e5
-				new Object[]{new Square((short) 6, (short) 3), new Square((short) 5, (short) 3), true},   // d2 -> d3
-				new Object[]{new Square((short) 1, (short) 5), new Square((short) 2, (short) 5), true},   // f7 -> f6
-				new Object[]{new Square((short) 5, (short) 4), new Square((short) 4, (short) 4), false},  // e3 -> e4 (trying to play with empty square)
-				new Object[]{new Square((short) 6, (short) 4), new Square((short) 7, (short) 4), false},  // backwards
-				new Object[]{new Square((short) 1, (short) 4), new Square((short) 0, (short) 4), false},  // backwards
-				new Object[]{new Square((short) -1, (short) 4), new Square((short) 4, (short) 4), false}, // out of board
-				new Object[]{new Square((short) 6, (short) -1), new Square((short) 4, (short) 4), false}, // out of board
-				new Object[]{new Square((short) 6, (short) 4), new Square((short) -1, (short) 4), false}, // out of board
-				new Object[]{new Square((short) 6, (short) 4), new Square((short) 4, (short) -1), false}  // out of board
+				new Object[]{new SquareDto((byte) 6, (byte) 4), new SquareDto((byte) 4, (byte) 4), true},   // e2 -> e4
+				new Object[]{new SquareDto((byte) 1, (byte) 4), new SquareDto((byte) 3, (byte) 4), true},   // e7 -> e5
+				new Object[]{new SquareDto((byte) 6, (byte) 3), new SquareDto((byte) 5, (byte) 3), true},   // d2 -> d3
+				new Object[]{new SquareDto((byte) 1, (byte) 5), new SquareDto((byte) 2, (byte) 5), true},   // f7 -> f6
+				new Object[]{new SquareDto((byte) 5, (byte) 4), new SquareDto((byte) 4, (byte) 4), false},  // e3 -> e4 (trying to play with empty square)
+				new Object[]{new SquareDto((byte) 6, (byte) 4), new SquareDto((byte) 7, (byte) 4), false},  // backwards
+				new Object[]{new SquareDto((byte) 1, (byte) 4), new SquareDto((byte) 0, (byte) 4), false},  // backwards
+				new Object[]{new SquareDto((byte) -1, (byte) 4), new SquareDto((byte) 4, (byte) 4), false}, // out of board
+				new Object[]{new SquareDto((byte) 6, (byte) -1), new SquareDto((byte) 4, (byte) 4), false}, // out of board
+				new Object[]{new SquareDto((byte) 6, (byte) 4), new SquareDto((byte) -1, (byte) 4), false}, // out of board
+				new Object[]{new SquareDto((byte) 6, (byte) 4), new SquareDto((byte) 4, (byte) -1), false}  // out of board
 		);
 	}
 	static Stream<Object[]> pawnMoveTestCasesForEnPassantPosition() {
 		return Stream.of(
-				new Object[]{new Square((short) 3, (short) 2), new Square((short) 2, (short) 1), true, "Eats 3,1"},   // c5 -> b6
-				new Object[]{new Square((short) 4, (short) 7), new Square((short) 5, (short) 6), true, "Eats 4,6"}    // h4 -> g3
+				new Object[]{new SquareDto((byte) 3, (byte) 2), new SquareDto((byte) 2, (byte) 1), true, "Eats 3,1"},   // c5 -> b6
+				new Object[]{new SquareDto((byte) 4, (byte) 7), new SquareDto((byte) 5, (byte) 6), true, "Eats 4,6"}    // h4 -> g3
 		);
 	}
 	static Stream<Object[]> pawnMoveTestCasesForFakeEnPassantPosition() {
 		return Stream.of(
-				new Object[]{new Square((short) 3, (short) 2), new Square((short) 2, (short) 1), false},   // c5 -> b6
-				new Object[]{new Square((short) 4, (short) 7), new Square((short) 5, (short) 6), false}    // h4 -> g3
+				new Object[]{new SquareDto((byte) 3, (byte) 2), new SquareDto((byte) 2, (byte) 1), false},   // c5 -> b6
+				new Object[]{new SquareDto((byte) 4, (byte) 7), new SquareDto((byte) 5, (byte) 6), false}    // h4 -> g3
 		);
 	}
 	static Stream<Object[]> pawnMoveTestCasesForEatPiecePosition() {
 		return Stream.of(
-				new Object[]{new Square((short) 6, (short) 1), new Square((short) 5, (short) 2), true},    // eating opposite color
-				new Object[]{new Square((short) 1, (short) 6), new Square((short) 2, (short) 5), true},    // eating opposite color
-				new Object[]{new Square((short) 6, (short) 1), new Square((short) 5, (short) 0), false},   // eating the same color
-				new Object[]{new Square((short) 4, (short) 1), new Square((short) 5, (short) 2), false},   // eating backwards
-				new Object[]{new Square((short) 4, (short) 3), new Square((short) 5, (short) 2), false},   // eating backwards
-				new Object[]{new Square((short) 1, (short) 6), new Square((short) 2, (short) 7), false},   // eating the same color
-				new Object[]{new Square((short) 3, (short) 6), new Square((short) 2, (short) 5), false},   // eating backwards
-				new Object[]{new Square((short) 3, (short) 4), new Square((short) 2, (short) 5), false}    // eating backwards
+				new Object[]{new SquareDto((byte) 6, (byte) 1), new SquareDto((byte) 5, (byte) 2), true},    // eating opposite color
+				new Object[]{new SquareDto((byte) 1, (byte) 6), new SquareDto((byte) 2, (byte) 5), true},    // eating opposite color
+				new Object[]{new SquareDto((byte) 6, (byte) 1), new SquareDto((byte) 5, (byte) 0), false},   // eating the same color
+				new Object[]{new SquareDto((byte) 4, (byte) 1), new SquareDto((byte) 5, (byte) 2), false},   // eating backwards
+				new Object[]{new SquareDto((byte) 4, (byte) 3), new SquareDto((byte) 5, (byte) 2), false},   // eating backwards
+				new Object[]{new SquareDto((byte) 1, (byte) 6), new SquareDto((byte) 2, (byte) 7), false},   // eating the same color
+				new Object[]{new SquareDto((byte) 3, (byte) 6), new SquareDto((byte) 2, (byte) 5), false},   // eating backwards
+				new Object[]{new SquareDto((byte) 3, (byte) 4), new SquareDto((byte) 2, (byte) 5), false}    // eating backwards
 		);
 	}
 	static Stream<Object[]> pawnMoveTestCasesForUpgradePosition() {
 		return Stream.of(
-				new Object[]{new Square((short) 1, (short) 6), new Square((short) 0, (short) 7), true, "Upgrade"},    // eat upgrade
-				new Object[]{new Square((short) 1, (short) 6), new Square((short) 0, (short) 5), true, "Upgrade"},    // eat upgrade
-				new Object[]{new Square((short) 1, (short) 1), new Square((short) 0, (short) 1), true, "Upgrade"},    // push upgrade
-				new Object[]{new Square((short) 6, (short) 6), new Square((short) 7, (short) 7), true, "Upgrade"},    // eat upgrade
-				new Object[]{new Square((short) 6, (short) 6), new Square((short) 7, (short) 5), true, "Upgrade"},    // eat upgrade
-				new Object[]{new Square((short) 6, (short) 1), new Square((short) 7, (short) 1), true, "Upgrade"},    // push upgrade
-				new Object[]{new Square((short) 6, (short) 6), new Square((short) 7, (short) 6), false, ""},   // push to filled square
-				new Object[]{new Square((short) 1, (short) 6), new Square((short) 0, (short) 6), false, ""}    // push to filled square
+				new Object[]{new SquareDto((byte) 1, (byte) 6), new SquareDto((byte) 0, (byte) 7), true, "Upgrade"},    // eat upgrade
+				new Object[]{new SquareDto((byte) 1, (byte) 6), new SquareDto((byte) 0, (byte) 5), true, "Upgrade"},    // eat upgrade
+				new Object[]{new SquareDto((byte) 1, (byte) 1), new SquareDto((byte) 0, (byte) 1), true, "Upgrade"},    // push upgrade
+				new Object[]{new SquareDto((byte) 6, (byte) 6), new SquareDto((byte) 7, (byte) 7), true, "Upgrade"},    // eat upgrade
+				new Object[]{new SquareDto((byte) 6, (byte) 6), new SquareDto((byte) 7, (byte) 5), true, "Upgrade"},    // eat upgrade
+				new Object[]{new SquareDto((byte) 6, (byte) 1), new SquareDto((byte) 7, (byte) 1), true, "Upgrade"},    // push upgrade
+				new Object[]{new SquareDto((byte) 6, (byte) 6), new SquareDto((byte) 7, (byte) 6), false, ""},   // push to filled square
+				new Object[]{new SquareDto((byte) 1, (byte) 6), new SquareDto((byte) 0, (byte) 6), false, ""}    // push to filled square
 		);
 	}
 
 	@ParameterizedTest
 	@MethodSource("pawnMoveTestCasesForStartingPosition")
-	void testPawnMoveStartingPosition(Square from, Square to, boolean expected) {
-		DataResult<Move> dataResult = moveService.isMovePossible(startingPosition, from, to);
+	void testPawnMoveStartingPosition(SquareDto from, SquareDto to, boolean expected) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(startingPosition, from, to);
 		assertEquals(expected, dataResult.isSuccess(), "Pawn move from " + from + " to " + to + " failed!");
 	}
 
 	@ParameterizedTest
 	@MethodSource("pawnMoveTestCasesForEnPassantPosition")
-	void testPawnMoveEnPassantPosition(Square from, Square to, boolean expected, String expectedMessage) {
-		DataResult<Move> dataResult = moveService.isMovePossible(enPassantPosition, from, to);
+	void testPawnMoveEnPassantPosition(SquareDto from, SquareDto to, boolean expected, String expectedMessage) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(enPassantPosition, from, to);
 		assertEquals(expected, dataResult.isSuccess(), "Pawn en passant move from " + from + " to " + to + " failed!");
 		assertEquals(expectedMessage, dataResult.getData().getMessage(), "Message is wrong!");
 	}
 
 	@ParameterizedTest
 	@MethodSource("pawnMoveTestCasesForFakeEnPassantPosition")
-	void testPawnMoveFakeEnPassantPosition(Square from, Square to, boolean expected) {
-		DataResult<Move> dataResult = moveService.isMovePossible(fakeEnPassantPosition, from, to);
+	void testPawnMoveFakeEnPassantPosition(SquareDto from, SquareDto to, boolean expected) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(fakeEnPassantPosition, from, to);
 		assertEquals(expected, dataResult.isSuccess(), "Fake en passant move from " + from + " to " + to + " failed!");
 	}
 
 	@ParameterizedTest
 	@MethodSource("pawnMoveTestCasesForEatPiecePosition")
-	void testPawnMoveEatPiecePosition(Square from, Square to, boolean expected) {
-		DataResult<Move> dataResult = moveService.isMovePossible(eatPiecePosition, from, to);
+	void testPawnMoveEatPiecePosition(SquareDto from, SquareDto to, boolean expected) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(eatPiecePosition, from, to);
 		assertEquals(expected, dataResult.isSuccess(), "Pawn capturing move from " + from + " to " + to + " failed!");
 	}
 
 	@ParameterizedTest
 	@MethodSource("pawnMoveTestCasesForUpgradePosition")
-	void testPawnMoveUpgradePosition(Square from, Square to, boolean expected, String expectedMessage) {
-		DataResult<Move> dataResult = moveService.isMovePossible(upgradePosition, from, to);
+	void testPawnMoveUpgradePosition(SquareDto from, SquareDto to, boolean expected, String expectedMessage) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(upgradePosition, from, to);
 		assertEquals(expected, dataResult.isSuccess(), "Pawn promotion move from " + from + " to " + to + " failed!");
 		assertEquals(expectedMessage, dataResult.getData().getMessage(), "Message is wrong!");
 	}

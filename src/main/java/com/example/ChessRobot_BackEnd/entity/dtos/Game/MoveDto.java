@@ -1,4 +1,4 @@
-package com.example.ChessRobot_BackEnd.entity.concretes;
+package com.example.ChessRobot_BackEnd.entity.dtos.Game;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class Square {
-    private short row;
-    private short col;
+public class MoveDto {
+    private byte row;
+    private byte col;
+    private String message;
 }
