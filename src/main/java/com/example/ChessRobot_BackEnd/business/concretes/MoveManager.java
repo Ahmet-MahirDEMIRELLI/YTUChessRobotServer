@@ -127,13 +127,23 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 3:  // white knight
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                rowDiff = rowDiff < 0 ? -rowDiff : rowDiff;
+                colDiff = colDiff < 0 ? -colDiff : colDiff;
+                if(((rowDiff == 1 && colDiff == 2) || (rowDiff == 2 && colDiff == 1)) &&                           // in L
+                        (board[end.getRow()][end.getCol()] == 0 ||                                                 // empty or
+                                (board[end.getRow()][end.getCol()] >= 8 &&                                         // has black piece
+                                        board[end.getRow()][end.getCol()] != ChessPiece.BLACK_KING.getValue()))){  // other than king
+                    isValid = true;
+                }
                 break;
             case 4:  // white bishop
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
-                     if((rowDiff == colDiff || rowDiff == -colDiff) &&                                              // in a diagonal and
-                           (board[end.getRow()][end.getCol()] == 0 ||                                               // empty or
-                                   (board[end.getRow()][end.getCol()] >= 8 &&                                       // has black piece
+                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                              // in a diagonal and
+                        (board[end.getRow()][end.getCol()] == 0 ||                                               // empty or
+                                (board[end.getRow()][end.getCol()] >= 8 &&                                       // has black piece
                                         board[end.getRow()][end.getCol()] != ChessPiece.BLACK_KING.getValue()))){   // other than king
                     int row = start.getRow();
                     int col = start.getCol();
@@ -405,12 +415,21 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 10:  // black knight
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                rowDiff = rowDiff < 0 ? -rowDiff : rowDiff;
+                colDiff = colDiff < 0 ? -colDiff : colDiff;
+                if(((rowDiff == 1 && colDiff == 2) || (rowDiff == 2 && colDiff == 1)) &&                   // in L
+                        (board[end.getRow()][end.getCol()] <= 7 &&                                         // empty or has white piece
+                                board[end.getRow()][end.getCol()] != ChessPiece.WHITE_KING.getValue())){   // other than king
+                    isValid = true;
+                }
                 break;
             case 11:  // black bishop
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
-                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                                   // in a diagonal and
-                        (board[end.getRow()][end.getCol()] <= 7 &&                                                  // empty or has white piece
+                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                       // in a diagonal and
+                        (board[end.getRow()][end.getCol()] <= 7 &&                                      // empty or has white piece
                              board[end.getRow()][end.getCol()] != ChessPiece.WHITE_KING.getValue())){   // other than king
                     int row = start.getRow();
                     int col = start.getCol();
