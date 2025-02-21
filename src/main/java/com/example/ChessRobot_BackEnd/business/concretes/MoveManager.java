@@ -93,7 +93,6 @@ public class MoveManager implements MoveService {
         move.setMessage("");
         int rowDiff;
         int colDiff;
-        int opponentKingValue = board[start.getRow()][start.getCol()] <= ChessPiece.WHITE_KING.getValue() ? ChessPiece.BLACK_KING.getValue() : ChessPiece.WHITE_KING.getValue();
         switch (board[start.getRow()][start.getCol()]){
             case 1:
                 if(start.getCol() == end.getCol() && start.getRow() - 1 == end.getRow()){  // 1 square push
@@ -132,10 +131,10 @@ public class MoveManager implements MoveService {
             case 4:
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
-                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                    // in a diagonal and
-                        (board[end.getRow()][end.getCol()] == 0 ||                                   // empty or
-                                (board[end.getRow()][end.getCol()] >= 8 &&                           // has black piece
-                                        board[end.getRow()][end.getCol()] != opponentKingValue))){   // other than king
+                     if((rowDiff == colDiff || rowDiff == -colDiff) &&                                              // in a diagonal and
+                           (board[end.getRow()][end.getCol()] == 0 ||                                               // empty or
+                                   (board[end.getRow()][end.getCol()] >= 8 &&                                       // has black piece
+                                        board[end.getRow()][end.getCol()] != ChessPiece.BLACK_KING.getValue()))){   // other than king
                     int row = start.getRow();
                     int col = start.getCol();
                     if(rowDiff > 0 && colDiff > 0){  // end is on the upper left diagonal of start
@@ -197,6 +196,61 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 5:
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                if(rowDiff == 0 || colDiff == 0 &&                                                          // in vertical or horizontal
+                        (board[end.getRow()][end.getCol()] == 0 ||                                          // empty or
+                            (board[end.getRow()][end.getCol()] >= 8 &&                                      // has black piece
+                                board[end.getRow()][end.getCol()] != ChessPiece.BLACK_KING.getValue()))){   // other than king
+                   if(rowDiff == 0){  // playing horizontal
+                       int col = start.getCol();
+                       if(colDiff > 0){  // end is on the left of start
+                           col--;
+                           while(col != end.getCol()){
+                               if(board[end.getRow()][col] != 0){  // piece between end and start
+                                   break;
+                               }
+                               col--;
+                           }
+                       }
+                       else{
+                           col++;
+                           while(col != end.getCol()){
+                               if(board[end.getRow()][col] != 0){  // piece between end and start
+                                   break;
+                               }
+                               col++;
+                           }
+                       }
+                       if(col == end.getCol()){
+                           isValid = true;
+                       }
+                   }
+                   else{
+                       int row = start.getRow();
+                       if(rowDiff > 0){  // end is on the up of start
+                           row--;
+                           while(row != end.getRow()){
+                               if(board[row][end.getCol()] != 0){  // piece between end and start
+                                   break;
+                               }
+                               row--;
+                           }
+                       }
+                       else{
+                           row++;
+                           while(row != end.getRow()){
+                               if(board[row][end.getCol()] != 0){  // piece between end and start
+                                   break;
+                               }
+                               row++;
+                           }
+                       }
+                       if(row == end.getRow()){
+                           isValid = true;
+                       }
+                   }
+                }
                 break;
             case 6:
                 break;
@@ -241,7 +295,7 @@ public class MoveManager implements MoveService {
                 colDiff = start.getCol() - end.getCol();
                 if((rowDiff == colDiff || rowDiff == -colDiff) &&                                                   // in a diagonal and
                         (board[end.getRow()][end.getCol()] <= 7 &&                                                  // empty or has white piece
-                                board[end.getRow()][end.getCol()] != ChessPiece.WHITE_KING.getValue())){   // other than king
+                             board[end.getRow()][end.getCol()] != ChessPiece.WHITE_KING.getValue())){   // other than king
                     int row = start.getRow();
                     int col = start.getCol();
                     if(rowDiff > 0 && colDiff > 0){  // end is on the upper left diagonal of start
@@ -303,6 +357,60 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 12:
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                if(rowDiff == 0 || colDiff == 0 &&                                                          // in vertical or horizontal
+                        (board[end.getRow()][end.getCol()] <= 7 &&                                          // empty or has white piece
+                             board[end.getRow()][end.getCol()] != ChessPiece.WHITE_KING.getValue())){    // other than king
+                    if(rowDiff == 0){  // playing horizontal
+                        int col = start.getCol();
+                        if(colDiff > 0){  // end is on the left of start
+                            col--;
+                            while(col != end.getCol()){
+                                if(board[end.getRow()][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                col--;
+                            }
+                        }
+                        else{
+                            col++;
+                            while(col != end.getCol()){
+                                if(board[end.getRow()][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                col++;
+                            }
+                        }
+                        if(col == end.getCol()){
+                            isValid = true;
+                        }
+                    }
+                    else{
+                        int row = start.getRow();
+                        if(rowDiff > 0){  // end is on the up of start
+                            row--;
+                            while(row != end.getRow()){
+                                if(board[row][end.getCol()] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row--;
+                            }
+                        }
+                        else{
+                            row++;
+                            while(row != end.getRow()){
+                                if(board[row][end.getCol()] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row++;
+                            }
+                        }
+                        if(row == end.getRow()){
+                            isValid = true;
+                        }
+                    }
+                }
                 break;
             case 13:
                 break;
