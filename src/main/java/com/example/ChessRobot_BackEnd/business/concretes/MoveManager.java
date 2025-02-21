@@ -94,7 +94,7 @@ public class MoveManager implements MoveService {
         int rowDiff;
         int colDiff;
         switch (board[start.getRow()][start.getCol()]){
-            case 1:
+            case 1:  // white pawn
                 if(start.getCol() == end.getCol() && start.getRow() - 1 == end.getRow()){  // 1 square push
                     if(end.getRow() == 0){  // upgrade
                         move.setMessage("Upgrade");
@@ -117,7 +117,7 @@ public class MoveManager implements MoveService {
                     isValid = true;
                 }
                 break;
-            case 2:
+            case 2:  // white pawn(pushed two square)
                 if(start.getCol() == end.getCol() && start.getRow() - 1 == end.getRow()){  // 1 square push
                     isValid = true;
                 }
@@ -126,9 +126,9 @@ public class MoveManager implements MoveService {
                     isValid = true;
                 }
                 break;
-            case 3:
+            case 3:  // white knight
                 break;
-            case 4:
+            case 4:  // white bishop
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                      if((rowDiff == colDiff || rowDiff == -colDiff) &&                                              // in a diagonal and
@@ -195,7 +195,7 @@ public class MoveManager implements MoveService {
                     }
                 }
                 break;
-            case 5:
+            case 5:  // white rook
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                 if(rowDiff == 0 || colDiff == 0 &&                                                          // in vertical or horizontal
@@ -252,11 +252,127 @@ public class MoveManager implements MoveService {
                    }
                 }
                 break;
-            case 6:
+            case 6:  // white queen
+                if(board[end.getRow()][end.getCol()] == 0 ||                                               // empty or
+                       (board[end.getRow()][end.getCol()] >= 8 &&                                          // has black piece
+                               board[end.getRow()][end.getCol()] != ChessPiece.BLACK_KING.getValue())) {    // other than king
+                    rowDiff = start.getRow() - end.getRow();
+                    colDiff = start.getCol() - end.getCol();
+                    if(rowDiff == colDiff || rowDiff == -colDiff){  // bishop move
+                        int row = start.getRow();
+                        int col = start.getCol();
+                        if(rowDiff > 0 && colDiff > 0){  // end is on the upper left diagonal of start
+                            row--;
+                            col--;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row--;
+                                col--;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                        else if(rowDiff > 0 && colDiff < 0) {  // end is on the upper right diagonal of start
+                            row--;
+                            col++;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row--;
+                                col++;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                        else if(rowDiff < 0 && colDiff > 0) {  // end is on the lower left diagonal of start
+                            row++;
+                            col--;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row++;
+                                col--;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                        else if(rowDiff < 0 && colDiff < 0) {  // end is on the lower right diagonal of start
+                            row++;
+                            col++;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row++;
+                                col++;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                    }
+                    else if(rowDiff == 0 || colDiff == 0){  // rook move
+                        if(rowDiff == 0){  // playing horizontal
+                            int col = start.getCol();
+                            if(colDiff > 0){  // end is on the left of start
+                                col--;
+                                while(col != end.getCol()){
+                                    if(board[end.getRow()][col] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    col--;
+                                }
+                            }
+                            else{
+                                col++;
+                                while(col != end.getCol()){
+                                    if(board[end.getRow()][col] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    col++;
+                                }
+                            }
+                            if(col == end.getCol()){
+                                isValid = true;
+                            }
+                        }
+                        else{
+                            int row = start.getRow();
+                            if(rowDiff > 0){  // end is on the up of start
+                                row--;
+                                while(row != end.getRow()){
+                                    if(board[row][end.getCol()] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    row--;
+                                }
+                            }
+                            else{
+                                row++;
+                                while(row != end.getRow()){
+                                    if(board[row][end.getCol()] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    row++;
+                                }
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                    }
+                }
                 break;
-            case 7:
+            case 7:  // white king
                 break;
-            case 8:
+            case 8:  // black pawn
                 if(start.getCol() == end.getCol() && start.getRow() + 1 == end.getRow()){  // 1 square push
                     if(end.getRow() == 7){  // upgrade
                         move.setMessage("Upgrade");
@@ -279,7 +395,7 @@ public class MoveManager implements MoveService {
                     isValid = true;
                 }
                 break;
-            case 9:
+            case 9:  // black pawn(pushed 2 square)
                 if(start.getCol() == end.getCol() && start.getRow() + 1 == end.getRow()){  // 1 square push
                     isValid = true;
                 }
@@ -288,9 +404,9 @@ public class MoveManager implements MoveService {
                     isValid = true;
                 }
                 break;
-            case 10:
+            case 10:  // black knight
                 break;
-            case 11:
+            case 11:  // black bishop
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                 if((rowDiff == colDiff || rowDiff == -colDiff) &&                                                   // in a diagonal and
@@ -356,7 +472,7 @@ public class MoveManager implements MoveService {
                     }
                 }
                 break;
-            case 12:
+            case 12:  // black rook
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                 if(rowDiff == 0 || colDiff == 0 &&                                                          // in vertical or horizontal
@@ -412,9 +528,9 @@ public class MoveManager implements MoveService {
                     }
                 }
                 break;
-            case 13:
+            case 13:  // black queen
                 break;
-            case 14:
+            case 14:  // black king
                 break;
         }
 
