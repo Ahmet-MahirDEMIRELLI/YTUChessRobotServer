@@ -1,20 +1,24 @@
 package com.example.ChessRobot_BackEnd.business.concretes;
 
 import com.example.ChessRobot_BackEnd.business.abstracts.MoveService;
+import com.example.ChessRobot_BackEnd.business.abstracts.ThreadCheckService;
 import com.example.ChessRobot_BackEnd.core.utilities.results.DataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.ErrorDataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.SuccessDataResult;
 import com.example.ChessRobot_BackEnd.entity.concretes.*;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.LightMatchDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 public class MoveManager implements MoveService {
+    private final ThreadCheckService threadCheckService;
 
     @Autowired
-    public MoveManager() {
+    public MoveManager(ThreadCheckService threadCheckService) {
         super();
+        this.threadCheckService = threadCheckService;
     }
 
     @Override
@@ -24,13 +28,18 @@ public class MoveManager implements MoveService {
         if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == 0){
             return new ErrorDataResult<>();
         }
-
-        DataResult<MoveDto> result = getMove(board, pieceStartSquare, pieceEndSquare);
+        boolean isWhitePlaying = board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] <= 7;
+        LightMatchDto matchDto = LightMatchDto.builder()
+                .isKingMoved(isWhitePlaying ? match.isWhiteKingMoved() : match.isBlackKingMoved())
+                .isShortRookMoved(isWhitePlaying ? match.isWhiteShortRookMoved() : match.isBlackShortRookMoved())
+                .isLongRookMoved(isWhitePlaying ? match.isWhiteLongRookMoved() : match.isBlackLongRookMoved())
+                .build();
+        DataResult<MoveDto> result = getMove(matchDto, board, pieceStartSquare, pieceEndSquare);
         if(!result.isSuccess()){
             return new ErrorDataResult<>();
         }
 
-        boolean isWhitePlaying = board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] <= 7;
+
         if(isWhitePlaying){
             if(match.isCheck()){
                 if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.WHITE_KING.getValue()){  // playing with the king
@@ -87,7 +96,7 @@ public class MoveManager implements MoveService {
         return null;
     }
 
-    private DataResult<MoveDto> getMove(byte[][] board, SquareDto start, SquareDto end){
+    private DataResult<MoveDto> getMove(LightMatchDto matchDto, byte[][] board, SquareDto start, SquareDto end){
         boolean isValid = false;
         MoveDto move = new MoveDto();
         move.setRow(end.getRow());
@@ -383,6 +392,28 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 7:  // white king
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                if(rowDiff == 1 || rowDiff == -1 || colDiff == 1 || colDiff == -1){ // normal king move
+                    if(!threadCheckService.isUnderThread(new SquareDto[]{new SquareDto(end.getRow(), end.getCol())}, true)){
+                        move.setMessage("White King Moved");
+                        isValid = true;
+                    }
+                }
+                else if(start.getRow() == 7 && start.getCol() == 4 && end.getRow() == 7 && end.getCol() == 6){  // short castle
+                    SquareDto[] squaresToCheck = {new SquareDto((byte) 7,( byte) 5), new SquareDto((byte)7, (byte)6)};
+                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[7][5] == 0 && board[7][6] == 0 && !threadCheckService.isUnderThread(squaresToCheck, true)){
+                        move.setMessage("White Short Castle");
+                        isValid = true;
+                    }
+                }
+                else if(start.getRow() == 7 && start.getCol() == 4 && end.getRow() == 7 && end.getCol() == 2){  // long castle
+                    SquareDto[] squaresToCheck = {new SquareDto((byte) 7,( byte) 3), new SquareDto((byte)7, (byte)2), new SquareDto((byte)7, (byte)1)};
+                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[7][3] == 0 && board[7][2] == 0 && board[7][1] == 0 && !threadCheckService.isUnderThread(squaresToCheck, true)){
+                        move.setMessage("White Long Castle");
+                        isValid = true;
+                    }
+                }
                 break;
             case 8:  // black pawn
                 if(start.getCol() == end.getCol() && start.getRow() + 1 == end.getRow()){  // 1 square push
@@ -550,8 +581,145 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 13:  // black queen
+                if(board[end.getRow()][end.getCol()] <= 7 &&                                        // empty or has white piece
+                        board[end.getRow()][end.getCol()] != ChessPiece.WHITE_KING.getValue()) {    // other than king
+                    rowDiff = start.getRow() - end.getRow();
+                    colDiff = start.getCol() - end.getCol();
+                    if(rowDiff == colDiff || rowDiff == -colDiff){  // bishop move
+                        int row = start.getRow();
+                        int col = start.getCol();
+                        if(rowDiff > 0 && colDiff > 0){  // end is on the upper left diagonal of start
+                            row--;
+                            col--;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row--;
+                                col--;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                        else if(rowDiff > 0 && colDiff < 0) {  // end is on the upper right diagonal of start
+                            row--;
+                            col++;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row--;
+                                col++;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                        else if(rowDiff < 0 && colDiff > 0) {  // end is on the lower left diagonal of start
+                            row++;
+                            col--;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row++;
+                                col--;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                        else if(rowDiff < 0 && colDiff < 0) {  // end is on the lower right diagonal of start
+                            row++;
+                            col++;
+                            while(row != end.getRow()){
+                                if(board[row][col] != 0){  // piece between end and start
+                                    break;
+                                }
+                                row++;
+                                col++;
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                    }
+                    else if(rowDiff == 0 || colDiff == 0){  // rook move
+                        if(rowDiff == 0){  // playing horizontal
+                            int col = start.getCol();
+                            if(colDiff > 0){  // end is on the left of start
+                                col--;
+                                while(col != end.getCol()){
+                                    if(board[end.getRow()][col] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    col--;
+                                }
+                            }
+                            else{
+                                col++;
+                                while(col != end.getCol()){
+                                    if(board[end.getRow()][col] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    col++;
+                                }
+                            }
+                            if(col == end.getCol()){
+                                isValid = true;
+                            }
+                        }
+                        else{
+                            int row = start.getRow();
+                            if(rowDiff > 0){  // end is on the up of start
+                                row--;
+                                while(row != end.getRow()){
+                                    if(board[row][end.getCol()] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    row--;
+                                }
+                            }
+                            else{
+                                row++;
+                                while(row != end.getRow()){
+                                    if(board[row][end.getCol()] != 0){  // piece between end and start
+                                        break;
+                                    }
+                                    row++;
+                                }
+                            }
+                            if(row == end.getRow()){
+                                isValid = true;
+                            }
+                        }
+                    }
+                }
                 break;
             case 14:  // black king
+                rowDiff = start.getRow() - end.getRow();
+                colDiff = start.getCol() - end.getCol();
+                if(rowDiff == 1 || rowDiff == -1 || colDiff == 1 || colDiff == -1){ // normal king move
+                    if(!threadCheckService.isUnderThread(new SquareDto[]{new SquareDto(end.getRow(), end.getCol())}, false)){
+                        move.setMessage("Black King Moved");
+                        isValid = true;
+                    }
+                }
+                else if(start.getRow() == 0 && start.getCol() == 4 && end.getRow() == 0 && end.getCol() == 6){  // short castle
+                    SquareDto[] squaresToCheck = {new SquareDto((byte) 0,( byte) 5), new SquareDto((byte)0, (byte)6)};
+                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[0][5] == 0 && board[0][6] == 0 && !threadCheckService.isUnderThread(squaresToCheck, false)){
+                        move.setMessage("Black Short Castle");
+                        isValid = true;
+                    }
+                }
+                else if(start.getRow() == 0 && start.getCol() == 4 && end.getRow() == 0 && end.getCol() == 2){  // long castle
+                    SquareDto[] squaresToCheck = {new SquareDto((byte) 0,( byte) 3), new SquareDto((byte)0, (byte)2), new SquareDto((byte)0, (byte)1)};
+                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[0][3] == 0 && board[0][2] == 0 && board[0][1] == 0 && !threadCheckService.isUnderThread(squaresToCheck, false)){
+                        move.setMessage("Black Long Castle");
+                        isValid = true;
+                    }
+                }
                 break;
         }
 
