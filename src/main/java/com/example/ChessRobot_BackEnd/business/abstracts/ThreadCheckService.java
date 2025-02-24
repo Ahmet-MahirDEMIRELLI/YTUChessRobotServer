@@ -8,5 +8,5 @@ import com.example.ChessRobot_BackEnd.entity.dtos.Game.PlayDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 
 public interface ThreadCheckService {
-    boolean isUnderThread(SquareDto[] squaresToCheck, boolean isWhitePlaying);
+    boolean isSquaresUnderThread(byte[][] board, SquareDto[] squaresToCheck, boolean isWhitePlaying);
 }

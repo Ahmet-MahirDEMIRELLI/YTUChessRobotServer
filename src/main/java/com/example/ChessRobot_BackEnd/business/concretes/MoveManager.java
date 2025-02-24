@@ -52,7 +52,7 @@ public class MoveManager implements MoveService {
                         }
                         return new ErrorDataResult<>();
                     }
-                    else{
+                    else{ 
                         return new ErrorDataResult<>();
                     }
                 }
@@ -395,21 +395,21 @@ public class MoveManager implements MoveService {
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                 if(rowDiff == 1 || rowDiff == -1 || colDiff == 1 || colDiff == -1){ // normal king move
-                    if(!threadCheckService.isUnderThread(new SquareDto[]{new SquareDto(end.getRow(), end.getCol())}, true)){
+                    if(!threadCheckService.isSquaresUnderThread(board, new SquareDto[]{new SquareDto(end.getRow(), end.getCol())}, true)){
                         move.setMessage("White King Moved");
                         isValid = true;
                     }
                 }
                 else if(start.getRow() == 7 && start.getCol() == 4 && end.getRow() == 7 && end.getCol() == 6){  // short castle
                     SquareDto[] squaresToCheck = {new SquareDto((byte) 7,( byte) 5), new SquareDto((byte)7, (byte)6)};
-                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[7][5] == 0 && board[7][6] == 0 && !threadCheckService.isUnderThread(squaresToCheck, true)){
+                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[7][5] == 0 && board[7][6] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, true)){
                         move.setMessage("White Short Castle");
                         isValid = true;
                     }
                 }
                 else if(start.getRow() == 7 && start.getCol() == 4 && end.getRow() == 7 && end.getCol() == 2){  // long castle
-                    SquareDto[] squaresToCheck = {new SquareDto((byte) 7,( byte) 3), new SquareDto((byte)7, (byte)2), new SquareDto((byte)7, (byte)1)};
-                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[7][3] == 0 && board[7][2] == 0 && board[7][1] == 0 && !threadCheckService.isUnderThread(squaresToCheck, true)){
+                    SquareDto[] squaresToCheck = {new SquareDto((byte) 7,( byte) 3), new SquareDto((byte)7, (byte)2)};
+                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[7][3] == 0 && board[7][2] == 0 && board[7][1] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, true)){
                         move.setMessage("White Long Castle");
                         isValid = true;
                     }
@@ -701,21 +701,21 @@ public class MoveManager implements MoveService {
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                 if(rowDiff == 1 || rowDiff == -1 || colDiff == 1 || colDiff == -1){ // normal king move
-                    if(!threadCheckService.isUnderThread(new SquareDto[]{new SquareDto(end.getRow(), end.getCol())}, false)){
+                    if(!threadCheckService.isSquaresUnderThread(board, new SquareDto[]{new SquareDto(end.getRow(), end.getCol())}, false)){
                         move.setMessage("Black King Moved");
                         isValid = true;
                     }
                 }
                 else if(start.getRow() == 0 && start.getCol() == 4 && end.getRow() == 0 && end.getCol() == 6){  // short castle
                     SquareDto[] squaresToCheck = {new SquareDto((byte) 0,( byte) 5), new SquareDto((byte)0, (byte)6)};
-                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[0][5] == 0 && board[0][6] == 0 && !threadCheckService.isUnderThread(squaresToCheck, false)){
+                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[0][5] == 0 && board[0][6] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, false)){
                         move.setMessage("Black Short Castle");
                         isValid = true;
                     }
                 }
                 else if(start.getRow() == 0 && start.getCol() == 4 && end.getRow() == 0 && end.getCol() == 2){  // long castle
-                    SquareDto[] squaresToCheck = {new SquareDto((byte) 0,( byte) 3), new SquareDto((byte)0, (byte)2), new SquareDto((byte)0, (byte)1)};
-                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[0][3] == 0 && board[0][2] == 0 && board[0][1] == 0 && !threadCheckService.isUnderThread(squaresToCheck, false)){
+                    SquareDto[] squaresToCheck = {new SquareDto((byte) 0,( byte) 3), new SquareDto((byte)0, (byte)2)};
+                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[0][3] == 0 && board[0][2] == 0 && board[0][1] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, false)){
                         move.setMessage("Black Long Castle");
                         isValid = true;
                     }
