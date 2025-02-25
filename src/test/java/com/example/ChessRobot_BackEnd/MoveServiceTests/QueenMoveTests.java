@@ -19,6 +19,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class QueenMoveTests {
 	@Autowired
 	private MoveService moveService;
+	private final Match playLikeKnightPosition = Match.builder()
+			.id(1)
+			.boardMatrix("12-10-11- 0-14-11-10-12-" +
+						 " 8- 8- 8- 8- 8- 8- 8- 8-" +
+						 " 0- 0- 0- 0- 13- 0- 0- 0-" +
+						 " 0- 0- 0- 0- 0- 0- 0- 0-" +
+						 " 0- 0- 0- 0- 0- 0- 0- 0-" +
+						 " 0- 0- 0- 6- 0- 0- 0- 0-" +
+						 " 1- 1- 1- 1- 1- 1- 1- 1-" +
+						 " 5- 3- 4- 0- 7- 4- 3- 5")
+			.whiteRemainingSeconds(1)
+			.blackRemainingSeconds(1)
+			.lastWhiteMoveDateTime(new Date())
+			.lastBlackMoveDateTime(new Date())
+			.build();
 	private final Match playEmptySquareOrEatPieceLikeBishopPosition = Match.builder()
 			.id(1)
 			.boardMatrix("12-10-11-13-14-11-10-12-" +
@@ -49,6 +64,12 @@ class QueenMoveTests {
 			.lastWhiteMoveDateTime(new Date())
 			.lastBlackMoveDateTime(new Date())
 			.build();
+	static Stream<Object[]> moveTestCasesForPlayLikeKnightPosition() {
+		return Stream.of(
+				new Object[]{new SquareDto((byte) 5, (byte) 3), new SquareDto((byte) 3, (byte) 4), false},   // not queen move
+				new Object[]{new SquareDto((byte) 2, (byte) 4), new SquareDto((byte) 3, (byte) 6), false}    // not queen move
+		);
+	}
 	static Stream<Object[]> bishopFeatureMoveTestCasesForPlayEmptySquareOrEatPieceLikeBishopPosition() {
 		return Stream.of(
 				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 6, (byte) 3), true},   // Vc1 -> Vd2
@@ -58,9 +79,9 @@ class QueenMoveTests {
 				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 3, (byte) 2), true},   // Vf8 -> Vc5
 				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 4, (byte) 1), true},   // Vf8 -> Vxb4
 				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 1, (byte) 6), false},  // eating same color
+				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 5, (byte) 0), false},  // trying to step over a piece
 				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 5, (byte) 0), false},  // eating same color
-				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 2, (byte) 7), false},  // trying to step over a piece
-				new Object[]{new SquareDto((byte) 0, (byte) 5), new SquareDto((byte) 5, (byte) 0), false}   // trying to step over a piece
+				new Object[]{new SquareDto((byte) 7, (byte) 2), new SquareDto((byte) 2, (byte) 7), false}   // trying to step over a piece
 		);
 	}
 	static Stream<Object[]> rookFeatureMoveTestCasesForPlayEmptySquareOrEatPieceLikeRookPosition() {
@@ -76,6 +97,13 @@ class QueenMoveTests {
 				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 6, (byte) 5), false},  // trying to jump over a piece
 				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 1), false}   // trying to jump over a piece
 		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("moveTestCasesForPlayLikeKnightPosition")
+	void testPlayLikeKnightPosition(SquareDto from, SquareDto to, boolean expected) {
+		DataResult<MoveDto> dataResult = moveService.isMovePossible(playLikeKnightPosition, from, to);
+		assertEquals(expected, dataResult.isSuccess(), "Queens move from " + from + " to " + to + " failed!");
 	}
 
 	@ParameterizedTest

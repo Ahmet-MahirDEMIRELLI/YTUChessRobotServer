@@ -38,14 +38,16 @@ class RookMoveTests {
 		return Stream.of(
 				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 4, (byte) 0), true},   // Kc4 -> Ka4
 				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 4, (byte) 5), true},   // Kc4 -> Kxf4
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 7), true},   // Kf5 -> Kc5
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 2), true},   // Kf5 -> Kxf4
 				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 7, (byte) 2), false},  // eating same color
 				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 1, (byte) 2), false},  // trying to jump over a piece
 				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 4, (byte) 6), false},  // trying to jump over a piece
-				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 7), true},   // Kf5 -> Kc5
-				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 2), true},   // Kf5 -> Kxf4
+				new Object[]{new SquareDto((byte) 4, (byte) 2), new SquareDto((byte) 5, (byte) 3), false},  // not rook move
 				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 0, (byte) 5), false},  // eating same color
 				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 6, (byte) 5), false},  // trying to jump over a piece
-				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 1), false}   // trying to jump over a piece
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 3, (byte) 1), false},  // trying to jump over a piece
+				new Object[]{new SquareDto((byte) 3, (byte) 5), new SquareDto((byte) 2, (byte) 6), false}   // not rook move
 		);
 	}
 
