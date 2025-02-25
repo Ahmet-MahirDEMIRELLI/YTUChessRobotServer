@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -27,8 +28,8 @@ public class Match {
     @Column(name = "fifty_move_counter")
     private int fiftyMoveCounter = 0;
 
-    @Column(name = "position_hashes", length = 199)
-    private String positionHashes = "0-0-0-0-0-0-0-0-0-0";
+    @Column(name = "position_hashes")
+    private String positionHashes = "";  // format: hash1/hash2/hash3 ...
 
     @Column(name = "white_remaining_seconds")
     private int whiteRemainingSeconds;

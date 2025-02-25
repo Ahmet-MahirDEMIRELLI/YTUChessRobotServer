@@ -205,10 +205,12 @@ class KingMoveTests {  // These tests indirectly tests isSquaresUnderThread func
 				new Object[]{new SquareDto((byte)3, (byte)5), new SquareDto((byte)4, (byte)4), false},  // Kings crossed
 				new Object[]{new SquareDto((byte)3, (byte)5), new SquareDto((byte)2, (byte)5), false},  // black pieces leg
 				new Object[]{new SquareDto((byte)3, (byte)5), new SquareDto((byte)2, (byte)6), false},  // black pieces leg
+				new Object[]{new SquareDto((byte)3, (byte)5), new SquareDto((byte)5, (byte)5), false},  // not king move
 				new Object[]{new SquareDto((byte)3, (byte)3), new SquareDto((byte)4, (byte)2), false},  // white pieces leg
 				new Object[]{new SquareDto((byte)3, (byte)3), new SquareDto((byte)4, (byte)4), false},  // Kings crossed
 				new Object[]{new SquareDto((byte)3, (byte)3), new SquareDto((byte)3, (byte)4), false},  // Kings crossed
-				new Object[]{new SquareDto((byte)3, (byte)3), new SquareDto((byte)2, (byte)4), false}   // Kings crossed
+				new Object[]{new SquareDto((byte)3, (byte)3), new SquareDto((byte)2, (byte)4), false},  // Kings crossed
+				new Object[]{new SquareDto((byte)3, (byte)3), new SquareDto((byte)3, (byte)0), false}   // not king move
 
 		);
 	}

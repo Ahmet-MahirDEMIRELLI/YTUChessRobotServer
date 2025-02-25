@@ -41,9 +41,11 @@ class BishopMoveTests {
 				new Object[]{new SquareDto((byte)0, (byte)5), new SquareDto((byte)3, (byte)2), true},   // Ff8 -> Fc5
 				new Object[]{new SquareDto((byte)0, (byte)5), new SquareDto((byte)4, (byte)1), true},   // Ff8 -> Fxb4
 				new Object[]{new SquareDto((byte)0, (byte)5), new SquareDto((byte)1, (byte)6), false},  // eating same color
+				new Object[]{new SquareDto((byte)0, (byte)5), new SquareDto((byte)0, (byte)4), false},  // not bishop move
+				new Object[]{new SquareDto((byte)0, (byte)5), new SquareDto((byte)5, (byte)0), false},  // trying to step over a piece
 				new Object[]{new SquareDto((byte)7, (byte)2), new SquareDto((byte)5, (byte)0), false},  // eating same color
 				new Object[]{new SquareDto((byte)7, (byte)2), new SquareDto((byte)2, (byte)7), false},  // trying to step over a piece
-				new Object[]{new SquareDto((byte)0, (byte)5), new SquareDto((byte)5, (byte)0), false}   // trying to step over a piece
+				new Object[]{new SquareDto((byte)7, (byte)2), new SquareDto((byte)6, (byte)4), false}   // trying to step over a piece
 		);
 	}
 

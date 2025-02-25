@@ -93,7 +93,9 @@ class PawnMoveTests {
 				new Object[]{new SquareDto((byte) 1, (byte) 5), new SquareDto((byte) 2, (byte) 5), true},   // f7 -> f6
 				new Object[]{new SquareDto((byte) 5, (byte) 4), new SquareDto((byte) 4, (byte) 4), false},  // e3 -> e4 (trying to play with empty square)
 				new Object[]{new SquareDto((byte) 6, (byte) 4), new SquareDto((byte) 7, (byte) 4), false},  // backwards
+				new Object[]{new SquareDto((byte) 6, (byte) 4), new SquareDto((byte) 6, (byte) 2), false},  // not pawn move
 				new Object[]{new SquareDto((byte) 1, (byte) 4), new SquareDto((byte) 0, (byte) 4), false},  // backwards
+				new Object[]{new SquareDto((byte) 1, (byte) 4), new SquareDto((byte) 0, (byte) 6), false},  // not pawn move
 				new Object[]{new SquareDto((byte) -1, (byte) 4), new SquareDto((byte) 4, (byte) 4), false}, // out of board
 				new Object[]{new SquareDto((byte) 6, (byte) -1), new SquareDto((byte) 4, (byte) 4), false}, // out of board
 				new Object[]{new SquareDto((byte) 6, (byte) 4), new SquareDto((byte) -1, (byte) 4), false}, // out of board

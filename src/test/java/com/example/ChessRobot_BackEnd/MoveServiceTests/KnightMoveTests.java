@@ -38,10 +38,12 @@ class KnightMoveTests {
 		return Stream.of(
 				new Object[]{new SquareDto((byte) 4, (byte) 4), new SquareDto((byte) 2, (byte) 5), true},   // Ae4 -> Axf6
 				new Object[]{new SquareDto((byte) 4, (byte) 4), new SquareDto((byte) 5, (byte) 6), true},   // Ae4 -> Ag3
-				new Object[]{new SquareDto((byte) 4, (byte) 4), new SquareDto((byte) 5, (byte) 2), false},  // eating same color
 				new Object[]{new SquareDto((byte) 3, (byte) 3), new SquareDto((byte) 5, (byte) 2), true},   // Ad5 -> Axc3
 				new Object[]{new SquareDto((byte) 3, (byte) 3), new SquareDto((byte) 2, (byte) 1), true},   // Ad5 -> Ab6
-				new Object[]{new SquareDto((byte) 3, (byte) 3), new SquareDto((byte) 1, (byte) 4), false}   // eating same color
+				new Object[]{new SquareDto((byte) 4, (byte) 4), new SquareDto((byte) 5, (byte) 2), false},  // eating same color
+				new Object[]{new SquareDto((byte) 4, (byte) 4), new SquareDto((byte) 5, (byte) 5), false},  // not knight move
+				new Object[]{new SquareDto((byte) 3, (byte) 3), new SquareDto((byte) 1, (byte) 4), false},  // eating same color
+				new Object[]{new SquareDto((byte) 3, (byte) 3), new SquareDto((byte) 4, (byte) 4), false}   // not knight move
 		);
 	}
 
