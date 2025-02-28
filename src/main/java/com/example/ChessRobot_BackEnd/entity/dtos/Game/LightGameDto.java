@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class LightMatchDto {
+public class LightGameDto {
     boolean isKingMoved;
     boolean isShortRookMoved;
     boolean isLongRookMoved;

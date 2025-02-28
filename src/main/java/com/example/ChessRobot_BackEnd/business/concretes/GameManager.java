@@ -6,8 +6,7 @@ import com.example.ChessRobot_BackEnd.business.abstracts.UserService;
 import com.example.ChessRobot_BackEnd.business.constants.GameMessages;
 import com.example.ChessRobot_BackEnd.core.utilities.results.*;
 import com.example.ChessRobot_BackEnd.dataAccess.abstracts.GameDao;
-import com.example.ChessRobot_BackEnd.entity.concretes.Game;
-import com.example.ChessRobot_BackEnd.entity.concretes.Match;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.GameDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.InitializeGameDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.PlayDto;
@@ -58,12 +57,12 @@ public class GameManager implements GameService {
             isUserWhite = false;
         }
 
-        Game game = Game.builder()
+        GameDto game = GameDto.builder()
                 .rated(true)
                 .time(gameDto.getTime())
                 //.whitePlayer(isUserWhite ? user : robot)
                 //.blackPlayer(isUserWhite ? robot : user)
-                .createdAt(new Date())
+                .startedAt(new Date())
                 .build();
 
         gameDao.save(game);
@@ -71,7 +70,7 @@ public class GameManager implements GameService {
     }
 
     @Override
-    public DataResult<Game> play(PlayDto playDto) {
+    public DataResult<GameDto> play(PlayDto playDto) {
         if (playDto.getUserId().isEmpty() || playDto.getGameId().isEmpty()) {
             return new ErrorDataResult<>(GameMessages.authorizationFailed);
         }
@@ -86,16 +85,15 @@ public class GameManager implements GameService {
         // kullanıcı ve game id ile bu maç aktif mi ve doğru kullanıcı mı diye bak
         // renge göre kendi taşı mı diye bak
 
-        Game game = null;
-        //Game game = gameService.getGameById(playDto.getGameId());
-        Match match = game.getMatch();
-        DataResult<MoveDto> moveDataResult = this.moveService.isMovePossible(match, playDto.getPieceStartSquare(), playDto.getPieceEndSquare());
+        GameDto game = null;
+        //GameDto game = gameService.getGameById(playDto.getGameId());
+        DataResult<MoveDto> moveDataResult = this.moveService.isMovePossible(game, playDto.getPieceStartSquare(), playDto.getPieceEndSquare());
         if(!moveDataResult.isSuccess()){
             return new ErrorDataResult<>(GameMessages.moveIsNotPossible);
         }
 
         MoveDto move = moveDataResult.getData();
-        DataResult<Game> gameDataResult = this.moveService.play(game, move);
+        DataResult<GameDto> gameDataResult = this.moveService.play(game, move);
         if(!gameDataResult.isSuccess()){
             return new ErrorDataResult<>(GameMessages.unexpectedErrorOccurred);
         }

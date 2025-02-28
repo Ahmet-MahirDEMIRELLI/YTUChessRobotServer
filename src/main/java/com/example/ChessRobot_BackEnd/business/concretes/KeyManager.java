@@ -1,19 +1,11 @@
 package com.example.ChessRobot_BackEnd.business.concretes;
 
 import com.example.ChessRobot_BackEnd.business.abstracts.KeyService;
-import com.example.ChessRobot_BackEnd.business.abstracts.UserService;
-import com.example.ChessRobot_BackEnd.business.constants.GameMessages;
 import com.example.ChessRobot_BackEnd.business.constants.KeyMessages;
 import com.example.ChessRobot_BackEnd.core.utilities.results.ErrorResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.Result;
 import com.example.ChessRobot_BackEnd.core.utilities.results.SuccessResult;
-import com.example.ChessRobot_BackEnd.dataAccess.abstracts.GameDao;
-import com.example.ChessRobot_BackEnd.entity.concretes.Game;
-import com.example.ChessRobot_BackEnd.entity.dtos.Game.InitializeGameDto;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Date;
-import java.util.Random;
 
 public class KeyManager implements KeyService {
 

@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.util.Date;
 
 @Entity
@@ -14,16 +13,12 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Data
-@Table(name = "games")
-public class Game {
+@Table(name = "completed_matches")
+public class CompletedMatch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-
-    @OneToOne(mappedBy = "games")
-    @JoinColumn(name = "match_id")
-    private Match match;
 
     @Column(name = "rated")
     private boolean rated;
@@ -47,11 +42,8 @@ public class Game {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date endedAt;
 
-    @Column(name = "white_moves")
-    private String whiteMoves = "";
-
-    @Column(name = "black_moves")
-    private String blackMoves = "";
+    @Column(name = "notation")
+    private String notation = "";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "game_status")

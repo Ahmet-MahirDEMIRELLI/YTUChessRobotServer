@@ -2,15 +2,13 @@ package com.example.ChessRobot_BackEnd.MoveServiceTests;
 
 import com.example.ChessRobot_BackEnd.business.abstracts.MoveService;
 import com.example.ChessRobot_BackEnd.core.utilities.results.DataResult;
-import com.example.ChessRobot_BackEnd.entity.concretes.Match;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.GameDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Date;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,50 +17,41 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class QueenMoveTests {
 	@Autowired
 	private MoveService moveService;
-	private final Match playLikeKnightPosition = Match.builder()
-			.id(1)
-			.boardMatrix("12-10-11- 0-14-11-10-12-" +
-						 " 8- 8- 8- 8- 8- 8- 8- 8-" +
-						 " 0- 0- 0- 0- 13- 0- 0- 0-" +
-						 " 0- 0- 0- 0- 0- 0- 0- 0-" +
-						 " 0- 0- 0- 0- 0- 0- 0- 0-" +
-						 " 0- 0- 0- 6- 0- 0- 0- 0-" +
-						 " 1- 1- 1- 1- 1- 1- 1- 1-" +
-						 " 5- 3- 4- 0- 7- 4- 3- 5")
-			.whiteRemainingSeconds(1)
-			.blackRemainingSeconds(1)
-			.lastWhiteMoveDateTime(new Date())
-			.lastBlackMoveDateTime(new Date())
+	private final GameDto playLikeKnightPosition = GameDto.builder()
+			.board(new byte[][] {
+					{ 12, 10, 11,  0, 14, 11, 10, 12 },
+					{  8,  8,  8,  8,  8,  8,  8,  8 },
+					{  0,  0,  0,  0, 13,  0,  0,  0 },
+					{  0,  0,  0,  0,  0,  0,  0,  0 },
+					{  0,  0,  0,  0,  0,  0,  0,  0 },
+					{  0,  0,  0,  6,  0,  0,  0,  0 },
+					{  1,  1,  1,  1,  1,  1,  1,  1 },
+					{  5,  3,  4,  0,  7,  4,  3,  5 }
+			})
 			.build();
-	private final Match playEmptySquareOrEatPieceLikeBishopPosition = Match.builder()
-			.id(1)
-			.boardMatrix("12-10-11-13-14-11-10-12-" +
-						 " 8- 8- 8- 8- 0- 8- 8- 0-" +
-						 " 0- 0- 0- 0- 0- 0- 0- 12-" +
-						 " 0- 0- 0- 0- 0- 0- 8- 0-" +
-						 " 0- 2- 0- 0- 0- 0- 0- 0-" +
-						 " 1- 0- 0- 0- 0- 0- 0- 0-" +
-						 " 0- 0- 1- 0- 1- 1- 1- 1-" +
-						 " 5- 3- 4- 6- 7- 4- 3- 5")
-			.whiteRemainingSeconds(1)
-			.blackRemainingSeconds(1)
-			.lastWhiteMoveDateTime(new Date())
-			.lastBlackMoveDateTime(new Date())
+	private final GameDto playEmptySquareOrEatPieceLikeBishopPosition = GameDto.builder()
+			.board(new byte[][] {
+					{ 12, 10, 11, 13, 14, 11, 10, 12 },
+					{  8,  8,  8,  8,  0,  8,  8,  0 },
+					{  0,  0,  0,  0,  0,  0,  0, 12 },
+					{  0,  0,  0,  0,  0,  0,  8,  0 },
+					{  0,  2,  0,  0,  0,  0,  0,  0 },
+					{  1,  0,  0,  0,  0,  0,  0,  0 },
+					{  0,  0,  1,  0,  1,  1,  1,  1 },
+					{  5,  3,  4,  6,  7,  4,  3,  5 }
+			})
 			.build();
-	private final Match playEmptySquareOrEatPieceLikeRookPosition = Match.builder()
-			.id(1)
-			.boardMatrix("12-10-11-13-14-11-10- 0-" +
-						 " 8- 8- 8- 8- 8- 0- 0- 0-" +
-						 " 0- 0- 0- 0- 0- 0- 0- 0-" +
-						 " 0- 1- 1- 0- 0-12- 0- 0-" +
-						 " 0- 0- 5- 0- 0- 8- 8- 0-" +
-						 " 0- 0- 0- 0- 0- 0- 0- 0-" +
-						 " 0- 0- 0- 1- 1- 1- 1- 1-" +
-						 " 0- 3- 4- 6- 7- 4- 3- 5")
-			.whiteRemainingSeconds(1)
-			.blackRemainingSeconds(1)
-			.lastWhiteMoveDateTime(new Date())
-			.lastBlackMoveDateTime(new Date())
+	private final GameDto playEmptySquareOrEatPieceLikeRookPosition = GameDto.builder()
+			.board(new byte[][] {
+					{ 12, 10, 11, 13, 14, 11, 10,  0 },
+					{  8,  8,  8,  8,  8,  0,  0,  0 },
+					{  0,  0,  0,  0,  0,  0,  0,  0 },
+					{  0,  1,  1,  0,  0, 12,  0,  0 },
+					{  0,  0,  5,  0,  0,  8,  8,  0 },
+					{  0,  0,  0,  0,  0,  0,  0,  0 },
+					{  0,  0,  0,  1,  1,  1,  1,  1 },
+					{  0,  3,  4,  6,  7,  4,  3,  5 }
+			})
 			.build();
 	static Stream<Object[]> moveTestCasesForPlayLikeKnightPosition() {
 		return Stream.of(

@@ -1,8 +1,8 @@
 package com.example.ChessRobot_BackEnd.dataAccess.abstracts;
 
-import com.example.ChessRobot_BackEnd.entity.concretes.Game;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.GameDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GameDao extends JpaRepository<Game, Integer> {
+public interface GameDao extends JpaRepository<GameDto, Integer> {
 
 }
