@@ -6,7 +6,8 @@ import com.example.ChessRobot_BackEnd.core.utilities.results.DataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.ErrorDataResult;
 import com.example.ChessRobot_BackEnd.core.utilities.results.SuccessDataResult;
 import com.example.ChessRobot_BackEnd.entity.concretes.*;
-import com.example.ChessRobot_BackEnd.entity.dtos.Game.LightMatchDto;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.GameDto;
+import com.example.ChessRobot_BackEnd.entity.dtos.Game.LightGameDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +23,17 @@ public class MoveManager implements MoveService {
     }
 
     @Override
-    public DataResult<MoveDto> isMovePossible(Match match, SquareDto pieceStartSquare, SquareDto pieceEndSquare) {
+    public DataResult<MoveDto> isMovePossible(GameDto game, SquareDto pieceStartSquare, SquareDto pieceEndSquare) {
         ArrayList<MoveDto> possibleMoves = new ArrayList<>();
-        byte[][] board = mapBoardMatrix(match.getBoardMatrix());
+        byte[][] board = game.getBoard();
         if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == 0){
             return new ErrorDataResult<>();
         }
         boolean isWhitePlaying = board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] <= 7;
-        LightMatchDto matchDto = LightMatchDto.builder()
-                .isKingMoved(isWhitePlaying ? match.isWhiteKingMoved() : match.isBlackKingMoved())
-                .isShortRookMoved(isWhitePlaying ? match.isWhiteShortRookMoved() : match.isBlackShortRookMoved())
-                .isLongRookMoved(isWhitePlaying ? match.isWhiteLongRookMoved() : match.isBlackLongRookMoved())
+        LightGameDto matchDto = LightGameDto.builder()
+                .isKingMoved(isWhitePlaying ? game.isWhiteKingMoved() : game.isBlackKingMoved())
+                .isShortRookMoved(isWhitePlaying ? game.isWhiteShortRookMoved() : game.isBlackShortRookMoved())
+                .isLongRookMoved(isWhitePlaying ? game.isWhiteLongRookMoved() : game.isBlackLongRookMoved())
                 .build();
         DataResult<MoveDto> result = getMove(matchDto, board, pieceStartSquare, pieceEndSquare);
         if(!result.isSuccess()){
@@ -41,18 +42,18 @@ public class MoveManager implements MoveService {
 
 
         if(isWhitePlaying){
-            if(match.isCheck()){
+            if(game.isCheck()){
                 if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.WHITE_KING.getValue()){  // playing with the king
 
                 }
                 else{
-                    if(match.getBlackCheckers().startsWith("-1", 9)){  // not double-check
+                    if(game.getBlackCheckers()[1].getRow() == -1){  // not double-check
                         if(doesItBlockCheck() || doesItTakeChecker()){
                             return new SuccessDataResult<>(result.getData());
                         }
                         return new ErrorDataResult<>();
                     }
-                    else{ 
+                    else{
                         return new ErrorDataResult<>();
                     }
                 }
@@ -67,12 +68,12 @@ public class MoveManager implements MoveService {
             }
         }
         else{
-            if(match.isCheck()){
+            if(game.isCheck()){
                 if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.BLACK_KING.getValue()){  // playing with the king
 
                 }
                 else{
-                    if(match.getWhiteCheckers().startsWith("-1", 9)){  // not double-check
+                    if(game.getWhiteCheckers()[1].getRow() == -1){  // not double-check
                         if(doesItBlockCheck() || doesItTakeChecker()){
                             return new SuccessDataResult<>(result.getData());
                         }
@@ -92,11 +93,11 @@ public class MoveManager implements MoveService {
     }
 
     @Override
-    public DataResult<Game> play(Game game, MoveDto move) {
+    public DataResult<GameDto> play(GameDto game, MoveDto move) {
         return null;
     }
 
-    private DataResult<MoveDto> getMove(LightMatchDto matchDto, byte[][] board, SquareDto start, SquareDto end){
+    private DataResult<MoveDto> getMove(LightGameDto matchDto, byte[][] board, SquareDto start, SquareDto end){
         boolean isValid = false;
         MoveDto move = new MoveDto();
         move.setRow(end.getRow());
@@ -741,22 +742,5 @@ public class MoveManager implements MoveService {
 
     private boolean isPinned(){
         return false;
-    }
-
-    private static byte[][] mapBoardMatrix(String boardMatrix) {
-        byte[][] board = new byte[8][8];
-        String[] pieces = boardMatrix.split("-");
-
-        if (pieces.length != 64) {
-            throw new IllegalArgumentException("Geçersiz tahta verisi, 64 parça olmalı.");
-        }
-
-        for (int i = 0; i < 64; i++) {
-            int row = i / 8;
-            int col = i % 8;
-            board[row][col] = Byte.parseByte(pieces[i]);
-        }
-
-        return board;
     }
 }
