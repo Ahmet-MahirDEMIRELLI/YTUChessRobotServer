@@ -49,8 +49,8 @@ public class User implements UserDetails {
     private boolean isBanned;
 
     @OneToOne(mappedBy = "user")
-    @JoinColumn(name = "game_id")
-    private Game games;
+    @JoinColumn(name = "completed_match_id")
+    private ArrayList<CompletedMatch> completedMatches;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @JoinTable(name = "authorities", joinColumns = @JoinColumn(name = "id"))
