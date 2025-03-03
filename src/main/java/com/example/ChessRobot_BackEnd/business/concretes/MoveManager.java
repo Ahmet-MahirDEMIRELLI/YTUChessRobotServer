@@ -30,16 +30,15 @@ public class MoveManager implements MoveService {
             return new ErrorDataResult<>();
         }
         boolean isWhitePlaying = board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] <= 7;
-        LightGameDto matchDto = LightGameDto.builder()
+        LightGameDto lightGameDto = LightGameDto.builder()
                 .isKingMoved(isWhitePlaying ? game.isWhiteKingMoved() : game.isBlackKingMoved())
                 .isShortRookMoved(isWhitePlaying ? game.isWhiteShortRookMoved() : game.isBlackShortRookMoved())
                 .isLongRookMoved(isWhitePlaying ? game.isWhiteLongRookMoved() : game.isBlackLongRookMoved())
                 .build();
-        DataResult<MoveDto> result = getMove(matchDto, board, pieceStartSquare, pieceEndSquare);
+        DataResult<MoveDto> result = getMove(lightGameDto, board, pieceStartSquare, pieceEndSquare);
         if(!result.isSuccess()){
             return new ErrorDataResult<>();
         }
-
 
         if(isWhitePlaying){
             if(game.isCheck()){
@@ -51,15 +50,12 @@ public class MoveManager implements MoveService {
                         if(doesItBlockCheck() || doesItTakeChecker()){
                             return new SuccessDataResult<>(result.getData());
                         }
-                        return new ErrorDataResult<>();
                     }
-                    else{
-                        return new ErrorDataResult<>();
-                    }
+                    return new ErrorDataResult<>();
                 }
             }
             else{
-                if(isPinned()){
+                if(isPinned(board, game.getWhiteKingPosition(), pieceStartSquare, pieceEndSquare, true)){
                     return new ErrorDataResult<>();
                 }
                 else{
@@ -77,15 +73,17 @@ public class MoveManager implements MoveService {
                         if(doesItBlockCheck() || doesItTakeChecker()){
                             return new SuccessDataResult<>(result.getData());
                         }
-                        return new ErrorDataResult<>();
                     }
-                    else{
-                        return new ErrorDataResult<>();
-                    }
+                    return new ErrorDataResult<>();
                 }
             }
             else{
-
+                if(isPinned(board, game.getBlackKingPosition(), pieceStartSquare, pieceEndSquare, false)){
+                    return new ErrorDataResult<>();
+                }
+                else{
+                    return new SuccessDataResult<>(result.getData());
+                }
             }
         }
 
@@ -740,7 +738,284 @@ public class MoveManager implements MoveService {
         return false;
     }
 
-    private boolean isPinned(){
-        return false;
+    private boolean isPinned(byte[][] board, SquareDto king, SquareDto pieceToMove, SquareDto squareToPlay, boolean isWhitePlaying){
+        boolean isPinned = false;
+        int type = threadCheckService.traceToKing(board, king, pieceToMove);
+        int row = pieceToMove.getRow();
+        int col = pieceToMove.getCol();
+        switch (type){
+            case 0:
+                break;
+            case 1:  // check left
+                if(pieceToMove.getRow() == squareToPlay.getRow() && pieceToMove.getCol() > squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    col--;
+                    if(isWhitePlaying){
+                        while(col >= 0){
+                            if(board[row][col] == ChessPiece.BLACK_ROOK.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            col--;
+                        }
+                    }
+                    else{
+                        while(col >= 0){
+                            if(board[row][col] == ChessPiece.WHITE_ROOK.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            col--;
+                        }
+                    }
+                }
+                break;
+            case 2:  // check right
+                if(pieceToMove.getRow() == squareToPlay.getRow() && pieceToMove.getCol() < squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    col++;
+                    if(isWhitePlaying){
+                        while(col <= 7){
+                            if(board[row][col] == ChessPiece.BLACK_ROOK.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            col++;
+                        }
+                    }
+                    else{
+                        while(col <= 7){
+                            if(board[row][col] == ChessPiece.WHITE_ROOK.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            col++;
+                        }
+                    }
+                }
+                break;
+            case 3:  // check up
+                if(pieceToMove.getRow() > squareToPlay.getRow() && pieceToMove.getCol() == squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    row--;
+                    if(isWhitePlaying){
+                        while(row >= 0){
+                            if(board[row][col] == ChessPiece.BLACK_ROOK.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row--;
+                        }
+                    }
+                    else{
+                        while(row >= 0){
+                            if(board[row][col] == ChessPiece.WHITE_ROOK.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row--;
+                        }
+                    }
+                }
+                break;
+            case 4:  // check down
+                if(pieceToMove.getRow() < squareToPlay.getRow() && pieceToMove.getCol() == squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    row++;
+                    if(isWhitePlaying){
+                        while(row <= 7){
+                            if(board[row][col] == ChessPiece.BLACK_ROOK.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row++;
+                        }
+                    }
+                    else{
+                        while(row <= 7){
+                            if(board[row][col] == ChessPiece.WHITE_ROOK.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row++;
+                        }
+                    }
+                }
+                break;
+            case 5:  // check down-right
+                if(pieceToMove.getRow() < squareToPlay.getRow() && pieceToMove.getCol() < squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    row++;
+                    col++;
+                    if(isWhitePlaying){
+                        while(row <= 7){
+                            if(board[row][col] == ChessPiece.BLACK_BISHOP.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row++;
+                            col++;
+                        }
+                    }
+                    else{
+                        while(row <= 7){
+                            if(board[row][col] == ChessPiece.WHITE_BISHOP.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row++;
+                            col++;
+                        }
+                    }
+                }
+                break;
+            case 6:  // check up-right
+                if(pieceToMove.getRow() > squareToPlay.getRow() && pieceToMove.getCol() < squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    row--;
+                    col++;
+                    if(isWhitePlaying){
+                        while(row >= 0){
+                            if(board[row][col] == ChessPiece.BLACK_BISHOP.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row--;
+                            col++;
+                        }
+                    }
+                    else{
+                        while(row >= 0){
+                            if(board[row][col] == ChessPiece.WHITE_BISHOP.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row--;
+                            col++;
+                        }
+                    }
+                }
+                break;
+            case 7:  // check up-left
+                if(pieceToMove.getRow() > squareToPlay.getRow() && pieceToMove.getCol() > squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    row--;
+                    col--;
+                    if(isWhitePlaying){
+                        while(row >= 0){
+                            if(board[row][col] == ChessPiece.BLACK_BISHOP.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row--;
+                            col--;
+                        }
+                    }
+                    else{
+                        while(row >= 0){
+                            if(board[row][col] == ChessPiece.WHITE_BISHOP.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row--;
+                            col--;
+                        }
+                    }
+                }
+                break;
+            case 8:  // check down-left
+                if(pieceToMove.getRow() < squareToPlay.getRow() && pieceToMove.getCol() > squareToPlay.getCol()){  // already playing to that direction so no problem
+                    break;
+                }
+                else{
+                    row++;
+                    col--;
+                    if(isWhitePlaying){
+                        while(row <= 7){
+                            if(board[row][col] == ChessPiece.BLACK_BISHOP.getValue() || board[row][col] == ChessPiece.BLACK_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row++;
+                            col--;
+                        }
+                    }
+                    else{
+                        while(row <= 7){
+                            if(board[row][col] == ChessPiece.WHITE_BISHOP.getValue() || board[row][col] == ChessPiece.WHITE_QUEEN.getValue()){
+                                isPinned = true;
+                                break;
+                            }
+                            else if(board[row][col] != 0){  // another piece
+                                break;
+                            }
+                            row++;
+                            col--;
+                        }
+                    }
+                }
+                break;
+        }
+
+        return isPinned;
     }
 }
