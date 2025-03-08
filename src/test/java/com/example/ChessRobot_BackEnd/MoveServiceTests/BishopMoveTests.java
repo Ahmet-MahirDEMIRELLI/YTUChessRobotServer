@@ -28,7 +28,7 @@ class BishopMoveTests {
 					{  0,  0,  1,  0,  1,  1,  1,  1 },
 					{  5,  3,  4,  6,  7,  4,  3,  5 }
 			})
-			.build();
+			.build(); 
 	static Stream<Object[]> bishopMoveTestCasesForPlayEmptySquareOrEatPiecePosition() {
 		return Stream.of(
 				new Object[]{new SquareDto((byte)7, (byte)2), new SquareDto((byte)6, (byte)3), true},   // Fc1 -> Fd2
