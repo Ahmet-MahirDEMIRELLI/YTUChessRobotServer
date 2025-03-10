@@ -11,7 +11,6 @@ import com.example.ChessRobot_BackEnd.entity.dtos.Game.LightGameDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.MoveDto;
 import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.*;
 
 public class MoveManager implements MoveService {
     private final ThreadCheckService threadCheckService;
@@ -24,7 +23,6 @@ public class MoveManager implements MoveService {
 
     @Override
     public DataResult<MoveDto> isMovePossible(GameDto game, SquareDto pieceStartSquare, SquareDto pieceEndSquare) {
-        ArrayList<MoveDto> possibleMoves = new ArrayList<>();
         byte[][] board = game.getBoard();
         if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == 0){
             return new ErrorDataResult<>();
@@ -43,11 +41,11 @@ public class MoveManager implements MoveService {
         if(isWhitePlaying){
             if(game.isCheck()){
                 if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.WHITE_KING.getValue()){  // playing with the king
-
+                    return new SuccessDataResult<>(result.getData());
                 }
                 else{
                     if(game.getBlackCheckers()[1].getRow() == -1){  // not double-check
-                        if(doesItBlockCheck() || doesItTakeChecker()){
+                        if(doesItBlockCheck(game.getWhiteKingPosition(), game.getBlackCheckers()[0], pieceEndSquare) || doesItTakeChecker(game.getBlackCheckers()[0], pieceEndSquare)){
                             return new SuccessDataResult<>(result.getData());
                         }
                     }
@@ -66,11 +64,11 @@ public class MoveManager implements MoveService {
         else{
             if(game.isCheck()){
                 if(board[pieceStartSquare.getRow()][pieceStartSquare.getCol()] == ChessPiece.BLACK_KING.getValue()){  // playing with the king
-
+                    return new SuccessDataResult<>(result.getData());
                 }
                 else{
                     if(game.getWhiteCheckers()[1].getRow() == -1){  // not double-check
-                        if(doesItBlockCheck() || doesItTakeChecker()){
+                        if(doesItBlockCheck(game.getBlackKingPosition(), game.getWhiteCheckers()[0], pieceEndSquare) || doesItTakeChecker(game.getWhiteCheckers()[0], pieceEndSquare)){
                             return new SuccessDataResult<>(result.getData());
                         }
                     }
@@ -86,8 +84,6 @@ public class MoveManager implements MoveService {
                 }
             }
         }
-
-        return new ErrorDataResult<>();
     }
 
     @Override
@@ -95,7 +91,7 @@ public class MoveManager implements MoveService {
         return null;
     }
 
-    private DataResult<MoveDto> getMove(LightGameDto matchDto, byte[][] board, SquareDto start, SquareDto end){
+    private DataResult<MoveDto> getMove(LightGameDto lightGameDto, byte[][] board, SquareDto start, SquareDto end){
         boolean isValid = false;
         MoveDto move = new MoveDto();
         move.setRow(end.getRow());
@@ -151,10 +147,10 @@ public class MoveManager implements MoveService {
             case 4:  // white bishop
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
-                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                              // in a diagonal and
-                        (board[end.getRow()][end.getCol()] == 0 ||                                               // empty or
-                                (board[end.getRow()][end.getCol()] >= 8 &&                                       // has black piece
-                                        board[end.getRow()][end.getCol()] != ChessPiece.BLACK_KING.getValue()))){   // other than king
+                if((rowDiff == colDiff || rowDiff == -colDiff) &&                                                  // in a diagonal and
+                        (board[end.getRow()][end.getCol()] == 0 ||                                                 // empty or
+                                (board[end.getRow()][end.getCol()] >= 8 &&                                         // has black piece
+                                        board[end.getRow()][end.getCol()] != ChessPiece.BLACK_KING.getValue()))){  // other than king
                     int row = start.getRow();
                     int col = start.getCol();
                     if(rowDiff > 0 && colDiff > 0){  // end is on the upper left diagonal of start
@@ -216,6 +212,14 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 5:  // white rook
+                if(start.getRow() == 7){
+                    if(start.getCol() == 0 && !lightGameDto.isLongRookMoved()){
+                        move.setMessage("White Long Rook Moved");
+                    }
+                    else if(start.getCol() == 7 && !lightGameDto.isShortRookMoved()){
+                        move.setMessage("White Short Rook Moved");
+                    }
+                }
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                 if(rowDiff == 0 || colDiff == 0 &&                                                          // in vertical or horizontal
@@ -401,14 +405,14 @@ public class MoveManager implements MoveService {
                 }
                 else if(start.getRow() == 7 && start.getCol() == 4 && end.getRow() == 7 && end.getCol() == 6){  // short castle
                     SquareDto[] squaresToCheck = {new SquareDto((byte) 7,( byte) 5), new SquareDto((byte)7, (byte)6)};
-                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[7][5] == 0 && board[7][6] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, true)){
+                    if(!lightGameDto.isKingMoved() && !lightGameDto.isShortRookMoved() && board[7][5] == 0 && board[7][6] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, true)){
                         move.setMessage("White Short Castle");
                         isValid = true;
                     }
                 }
                 else if(start.getRow() == 7 && start.getCol() == 4 && end.getRow() == 7 && end.getCol() == 2){  // long castle
                     SquareDto[] squaresToCheck = {new SquareDto((byte) 7,( byte) 3), new SquareDto((byte)7, (byte)2)};
-                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[7][3] == 0 && board[7][2] == 0 && board[7][1] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, true)){
+                    if(!lightGameDto.isKingMoved() && !lightGameDto.isLongRookMoved() && board[7][3] == 0 && board[7][2] == 0 && board[7][1] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, true)){
                         move.setMessage("White Long Castle");
                         isValid = true;
                     }
@@ -524,6 +528,14 @@ public class MoveManager implements MoveService {
                 }
                 break;
             case 12:  // black rook
+                if(start.getRow() == 0){
+                    if(start.getCol() == 0 && !lightGameDto.isLongRookMoved()){
+                        move.setMessage("Black Long Rook Moved");
+                    }
+                    else if(start.getCol() == 7 && !lightGameDto.isShortRookMoved()){
+                        move.setMessage("Black Short Rook Moved");
+                    }
+                }
                 rowDiff = start.getRow() - end.getRow();
                 colDiff = start.getCol() - end.getCol();
                 if(rowDiff == 0 || colDiff == 0 &&                                                          // in vertical or horizontal
@@ -707,14 +719,14 @@ public class MoveManager implements MoveService {
                 }
                 else if(start.getRow() == 0 && start.getCol() == 4 && end.getRow() == 0 && end.getCol() == 6){  // short castle
                     SquareDto[] squaresToCheck = {new SquareDto((byte) 0,( byte) 5), new SquareDto((byte)0, (byte)6)};
-                    if(!matchDto.isKingMoved() && !matchDto.isShortRookMoved() && board[0][5] == 0 && board[0][6] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, false)){
+                    if(!lightGameDto.isKingMoved() && !lightGameDto.isShortRookMoved() && board[0][5] == 0 && board[0][6] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, false)){
                         move.setMessage("Black Short Castle");
                         isValid = true;
                     }
                 }
                 else if(start.getRow() == 0 && start.getCol() == 4 && end.getRow() == 0 && end.getCol() == 2){  // long castle
                     SquareDto[] squaresToCheck = {new SquareDto((byte) 0,( byte) 3), new SquareDto((byte)0, (byte)2)};
-                    if(!matchDto.isKingMoved() && !matchDto.isLongRookMoved() && board[0][3] == 0 && board[0][2] == 0 && board[0][1] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, false)){
+                    if(!lightGameDto.isKingMoved() && !lightGameDto.isLongRookMoved() && board[0][3] == 0 && board[0][2] == 0 && board[0][1] == 0 && !threadCheckService.isSquaresUnderThread(board, squaresToCheck, false)){
                         move.setMessage("Black Long Castle");
                         isValid = true;
                     }
@@ -730,12 +742,58 @@ public class MoveManager implements MoveService {
         }
     }
 
-    private boolean doesItBlockCheck(){
-        return false;
+    private boolean doesItBlockCheck(SquareDto king, SquareDto checker, SquareDto end){
+        boolean doesItBlockCheck = false;
+        int checkerRowDiff = checker.getRow() - king.getRow();
+        int checkerColDiff = checker.getCol() - king.getCol();
+        int blockerRowDiff = end.getRow() - king.getRow();
+        int blockerColDiff = end.getCol() - king.getCol();
+        if(checkerRowDiff == 0 && checkerColDiff > 0){  // checker is on the right
+            if(blockerRowDiff == 0 && blockerColDiff > 0 && blockerColDiff < checkerColDiff){
+                doesItBlockCheck = true;
+            }
+        }
+        else if(checkerRowDiff == 0 && checkerColDiff < 0){  // checker is on the left
+            if(blockerRowDiff == 0 && blockerColDiff < 0 && blockerColDiff > checkerColDiff){
+                doesItBlockCheck = true;
+            }
+        }
+        else if(checkerColDiff == 0 && checkerRowDiff > 0){  // checker is on the lower
+            if(blockerColDiff == 0 && blockerRowDiff > 0 && blockerRowDiff < checkerRowDiff){
+                doesItBlockCheck = true;
+            }
+        }
+        else if(checkerColDiff == 0 && checkerRowDiff < 0){  // checker is on the upper
+            if(blockerColDiff == 0 && blockerRowDiff < 0 && blockerRowDiff > checkerRowDiff){
+                doesItBlockCheck = true;
+            }
+        }
+        else if(checkerRowDiff > 0 && checkerColDiff > 0){  // checker is on the lower-right
+            if(blockerRowDiff > 0 && blockerRowDiff == blockerColDiff && blockerRowDiff < checkerRowDiff){
+                doesItBlockCheck = true;
+            }
+        }
+        else if(checkerRowDiff < 0 && checkerColDiff > 0){  // checker is on the upper-right
+            if(blockerRowDiff < 0 && blockerRowDiff == -blockerColDiff && blockerRowDiff > checkerRowDiff){
+                doesItBlockCheck = true;
+            }
+        }
+        else if(checkerRowDiff < 0){  // checker is on the upper-left
+            if(blockerRowDiff < 0 && blockerRowDiff == blockerColDiff && blockerRowDiff > checkerRowDiff){
+                doesItBlockCheck = true;
+            }
+        }
+        else if(checkerRowDiff > 0){  // checker is on the lower-left
+            if(blockerRowDiff > 0 && blockerRowDiff == -blockerColDiff && blockerRowDiff < checkerRowDiff){
+                doesItBlockCheck = true;
+            }
+        }
+
+        return doesItBlockCheck;
     }
 
-    private boolean doesItTakeChecker(){
-        return false;
+    private boolean doesItTakeChecker(SquareDto checker, SquareDto end){
+        return checker.getRow() == end.getRow() && checker.getCol() == end.getCol();
     }
 
     private boolean isPinned(byte[][] board, SquareDto king, SquareDto pieceToMove, SquareDto squareToPlay, boolean isWhitePlaying){
