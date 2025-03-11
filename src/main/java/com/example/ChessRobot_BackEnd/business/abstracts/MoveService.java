@@ -7,5 +7,5 @@ import com.example.ChessRobot_BackEnd.entity.dtos.Game.SquareDto;
 
 public interface MoveService {
     DataResult<MoveDto> isMovePossible(GameDto game, SquareDto pieceStartSquare, SquareDto pieceEndSquare);
-    DataResult<GameDto> play(GameDto game, MoveDto moveDto);
+    DataResult<GameDto> play(GameDto game, String upgradeChoice, SquareDto pieceStartSquare, MoveDto moveDto);
 }
