@@ -17,4 +17,6 @@ public class PlayDto {
     private SquareDto pieceStartSquare;
 
     private SquareDto pieceEndSquare;
+
+    private String upgradeChoice;
 }

@@ -20,8 +20,8 @@ public class GameDto {
     private UUID whitePlayerId;
     private UUID blackPlayerId;
     private Date startedAt;
-    private String whiteMoves = "";
-    private String blackMoves = "";
+    private ArrayList<String> whiteMoves = new ArrayList<>();
+    private ArrayList<String> blackMoves = new ArrayList<>();
     private GameStatus gameStatus;
     // Match fields
     private short moveCount = 0;
@@ -49,6 +49,8 @@ public class GameDto {
     private boolean isWhiteLongRookMoved = false;
     private boolean isBlackShortRookMoved = false;
     private boolean isBlackLongRookMoved = false;
+    private SquareDto whiteTwoPawn = new SquareDto((byte)-1, (byte)-1);
+    private SquareDto blackTwoPawn = new SquareDto((byte)-1, (byte)-1);
     private SquareDto whiteKingPosition = new SquareDto((byte)7, (byte)4);
     private SquareDto blackKingPosition = new SquareDto((byte)0, (byte)4);
     private SquareDto[] whiteCheckers = new SquareDto[]{new SquareDto((byte)-1, (byte)-1), new SquareDto((byte)-1, (byte)-1)};

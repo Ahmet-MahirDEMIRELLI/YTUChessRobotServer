@@ -93,7 +93,7 @@ public class GameManager implements GameService {
         }
 
         MoveDto move = moveDataResult.getData();
-        DataResult<GameDto> gameDataResult = this.moveService.play(game, move);
+        DataResult<GameDto> gameDataResult = this.moveService.play(game, playDto.getUpgradeChoice(), playDto.getPieceStartSquare(), move);
         if(!gameDataResult.isSuccess()){
             return new ErrorDataResult<>(GameMessages.unexpectedErrorOccurred);
         }
